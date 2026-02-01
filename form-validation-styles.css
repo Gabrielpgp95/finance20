@@ -1,0 +1,400 @@
+/**
+ * REAL-TIME FORM VALIDATION STYLES
+ * Visual feedback pentru erori
+ */
+
+/* ==========================================
+   FIELD VALIDATION STATES
+   ========================================== */
+
+.form-group {
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+.form-group.error-field {
+    animation: shake 0.4s ease-in-out;
+}
+
+/* Error shake animation */
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+}
+
+.form-group.error-field input,
+.form-group.error-field select,
+.form-group.error-field textarea {
+    border-color: #f44336 !important;
+    border-width: 2px !important;
+    box-shadow: 0 0 0 3px rgba(244, 67, 54, 0.15) !important;
+    background-color: rgba(244, 67, 54, 0.05);
+}
+
+/* Warning state */
+.form-group.warning-field input,
+.form-group.warning-field select,
+.form-group.warning-field textarea {
+    border-color: #ff9800 !important;
+    border-width: 2px !important;
+    box-shadow: 0 0 0 3px rgba(255, 152, 0, 0.15) !important;
+    background-color: rgba(255, 152, 0, 0.05);
+}
+
+/* Success state */
+.form-group.success-field input,
+.form-group.success-field select,
+.form-group.success-field textarea {
+    border-color: #4caf50 !important;
+    box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1) !important;
+    background-color: rgba(76, 175, 80, 0.02);
+}
+
+/* ==========================================
+   ERROR MESSAGE DISPLAY
+   ========================================== */
+
+.field-error-message {
+    display: block;
+    font-size: 0.85rem;
+    color: #f44336;
+    margin-top: 6px;
+    font-weight: 600;
+    animation: slideDown 0.3s ease-out;
+}
+
+.field-error-message.warning {
+    color: #ff9800;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-5px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ==========================================
+   TOAST NOTIFICATIONS
+   ========================================== */
+
+.form-toast {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 9999;
+    max-width: 400px;
+    animation: slideInRight 0.3s ease-out;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    backdrop-filter: blur(10px);
+}
+
+@keyframes slideInRight {
+    from {
+        opacity: 0;
+        transform: translateX(100%);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes slideOutRight {
+    from {
+        opacity: 1;
+        transform: translateX(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateX(100%);
+    }
+}
+
+/* Toast variants */
+.form-toast-error {
+    background: linear-gradient(135deg, #f44336 0%, #e53935 100%);
+    color: white;
+}
+
+.form-toast-warning {
+    background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%);
+    color: white;
+}
+
+.form-toast-success {
+    background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
+    color: white;
+}
+
+.form-toast-info {
+    background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%);
+    color: white;
+}
+
+.toast-content {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 20px;
+}
+
+.toast-icon {
+    font-size: 1.5rem;
+    flex-shrink: 0;
+}
+
+.toast-message {
+    flex: 1;
+    font-weight: 500;
+    line-height: 1.4;
+}
+
+.toast-close {
+    background: none;
+    border: none;
+    color: inherit;
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 4px;
+    transition: all 0.2s;
+    flex-shrink: 0;
+}
+
+.toast-close:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: scale(1.1);
+}
+
+.toast-close:active {
+    transform: scale(0.95);
+}
+
+/* ==========================================
+   ERROR SUMMARY PANEL
+   ========================================== */
+
+.error-summary-panel {
+    background: #ffebee;
+    border-left: 4px solid #f44336;
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 20px;
+    display: none;
+    animation: slideDown 0.3s ease-out;
+}
+
+.error-summary-panel.show {
+    display: block;
+}
+
+.error-summary-panel h4 {
+    color: #c62828;
+    margin: 0 0 12px 0;
+    font-size: 1.1rem;
+}
+
+.error-summary-panel ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.error-summary-panel li {
+    color: #f44336;
+    margin: 8px 0;
+    padding-left: 24px;
+    position: relative;
+    font-weight: 600;
+}
+
+.error-summary-panel li:before {
+    content: '❌';
+    position: absolute;
+    left: 0;
+    top: -2px;
+    font-size: 1.2rem;
+}
+
+/* ==========================================
+   VALIDATION BADGE
+   ========================================== */
+
+.field-validation-badge {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 1.2rem;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.form-group.error-field .field-validation-badge {
+    opacity: 1;
+    content: '❌';
+}
+
+.form-group.warning-field .field-validation-badge {
+    opacity: 1;
+    content: '⚠️';
+}
+
+.form-group.success-field .field-validation-badge {
+    opacity: 1;
+    content: '✅';
+}
+
+/* ==========================================
+   MOBILE OPTIMIZATION
+   ========================================== */
+
+@media (max-width: 768px) {
+    .form-toast {
+        max-width: calc(100vw - 20px);
+        bottom: 10px;
+        right: 10px;
+        left: 10px;
+    }
+
+    .field-error-message {
+        font-size: 0.8rem;
+    }
+
+    .error-summary-panel {
+        padding: 12px;
+        margin-bottom: 15px;
+    }
+
+    .error-summary-panel h4 {
+        font-size: 1rem;
+    }
+
+    .error-summary-panel li {
+        font-size: 0.9rem;
+        margin: 6px 0;
+    }
+}
+
+@media (max-width: 480px) {
+    .toast-content {
+        gap: 8px;
+        padding: 12px 16px;
+    }
+
+    .toast-icon {
+        font-size: 1.3rem;
+    }
+
+    .toast-message {
+        font-size: 0.9rem;
+    }
+
+    .toast-close {
+        font-size: 1rem;
+    }
+
+    .field-error-message {
+        font-size: 0.75rem;
+        margin-top: 4px;
+    }
+}
+
+/* ==========================================
+   DARK MODE SUPPORT
+   ========================================== */
+
+body.dark-mode .error-summary-panel {
+    background: rgba(244, 67, 54, 0.1);
+    border-left-color: #f44336;
+}
+
+body.dark-mode .error-summary-panel h4 {
+    color: #ff6b6b;
+}
+
+body.dark-mode .error-summary-panel li {
+    color: #ff6b6b;
+}
+
+body.dark-mode .field-error-message {
+    color: #ff6b6b;
+}
+
+body.dark-mode .field-error-message.warning {
+    color: #ffb74d;
+}
+
+/* ==========================================
+   ACCESSIBILITY
+   ========================================== */
+
+.field-error-message {
+    role: alert;
+    aria-live: polite;
+}
+
+.form-toast {
+    role: alert;
+    aria-live: assertive;
+}
+
+/* Focus visible for keyboard navigation */
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+    outline: 2px solid #667eea;
+    outline-offset: 2px;
+}
+
+.form-group.error-field input:focus-visible,
+.form-group.error-field select:focus-visible,
+.form-group.error-field textarea:focus-visible {
+    outline: 2px solid #f44336;
+    outline-offset: 2px;
+}
+
+/* ==========================================
+   ANIMATIONS
+   ========================================== */
+
+@keyframes pulse {
+    0%, 100% {
+        box-shadow: 0 0 0 0 rgba(244, 67, 54, 0.7);
+    }
+    50% {
+        box-shadow: 0 0 0 8px rgba(244, 67, 54, 0);
+    }
+}
+
+.form-group.error-field.pulse input,
+.form-group.error-field.pulse select,
+.form-group.error-field.pulse textarea {
+    animation: pulse 1.5s infinite;
+}
+
+/* Validation success animation */
+@keyframes checkmark {
+    0% {
+        transform: scale(0) rotate(-45deg);
+        opacity: 0;
+    }
+    50% {
+        transform: scale(1.2) rotate(0deg);
+    }
+    100% {
+        transform: scale(1) rotate(0deg);
+        opacity: 1;
+    }
+}
+
+.form-group.success-field .field-validation-badge {
+    animation: checkmark 0.5s ease-out;
+}

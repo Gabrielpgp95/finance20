@@ -1,0 +1,1555 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Planificator Programări Clienți - Ediție Profesională</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="settings-styles.css">
+    <link rel="stylesheet" href="mobile-invoice-quote-optimize.css">
+    <link rel="stylesheet" href="form-validation-styles.css">
+    <!-- PDF Export Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+    <!-- Excel Export Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <!-- QR Code Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📅 Planificator Programări Clienți - Ediție Profesională</h1>
+            <div class="header-buttons">
+                <button id="dashboardBtn" class="tab-btn active">Panou</button>
+                <button id="clientsBtn" class="tab-btn">Clienți</button>
+                <button id="appointmentsBtn" class="tab-btn">Programări</button>
+                <button id="invoicesBtn" class="tab-btn">💰 Facturi</button>
+                <button id="quotesBtn" class="tab-btn">📄 Oferte</button>
+                <button id="calendarBtn" class="tab-btn">Calendar</button>
+                <button id="settingsBtn" class="tab-btn">⚙️ Setări</button>
+            </div>
+            <!-- Mobile Controls Toggle Button -->
+            <button class="mobile-controls-toggle-btn" id="mobileControlsToggleBtn" onclick="toggleMobileControls()">
+                ⚙️ Controale
+                <span class="toggle-arrow">▼</span>
+            </button>
+            
+            <div class="header-actions" id="headerActionsPanel">
+                <div class="orthodox-toggle">
+                    <label>
+                        <input type="checkbox" id="orthodoxToggle" checked>
+                        <span>☦ Calendar Ortodox</span>
+                    </label>
+                </div>
+                <div class="dark-mode-toggle">
+                    <label>
+                        <input type="checkbox" id="darkModeToggle">
+                        <span>🌙 Mod Întunecat</span>
+                    </label>
+                </div>
+                <div class="auto-backup-status">
+                    <span id="autoBackupIndicator" title="Auto-backup activ">💾 Auto-Backup: ON</span>
+                </div>
+                <button id="smartRemindersBtn" class="btn btn-warning" title="Reminder-e Inteligente">⏰ Reminder-e</button>
+                <button id="exportExcelBtn" class="btn btn-success" title="Exportă în Excel">📊 Excel</button>
+                <button id="exportPdfBtn" class="btn btn-success" title="Exportă în PDF">📄 PDF</button>
+                <button id="exportBtn" class="btn btn-secondary" title="Exportă Date">📥 Backup</button>
+            </div>
+        </header>
+
+        <!-- Sync Controls Toggle -->
+        <div class="sync-controls-wrapper">
+            <button class="sync-toggle-btn" id="syncToggleBtn" onclick="toggleSyncPanel()">
+                🔄 Sincronizare
+                <span class="toggle-arrow">▼</span>
+            </button>
+            <div class="sync-controls" id="syncControlsPanel" style="display: none;">
+                <div class="sync-buttons">
+                    <button class="push-btn" onclick="pushToServer()" title="Trimite la Server">
+                        ⬆️ Trimite
+                    </button>
+                    <button class="pull-btn" onclick="pullFromServer()" title="Preia de la Server">
+                        ⬇️ Preia
+                    </button>
+                    <button class="backup-btn" onclick="showBackups()" title="Vezi Backup-uri">
+                        💾 Backup-uri
+                    </button>
+                </div>
+                <div class="sync-info">
+                    <span id="lastPush" style="color: #ff6b6b;">⬆️ Niciodată trimis</span>
+                    <span style="margin: 0 10px;">|</span>
+                    <span id="lastPull" style="color: #4ecdc4;">⬇️ Niciodată preluat</span>
+                    <span style="margin: 0 10px;">|</span>
+                    <span id="syncStatus" style="color: #1f2937; font-weight: 600;">Gata</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dashboard Section -->
+        <section id="dashboardSection" class="section active">
+            <!-- Dashboard Toggle Button -->
+            <button class="dashboard-toggle-btn" id="dashboardToggleBtn" onclick="toggleDashboardPanel()">
+                📊 Panou de Control
+                <span class="toggle-arrow">▼</span>
+            </button>
+            
+            <!-- Collapsible Dashboard Content -->
+            <div id="dashboardContentPanel" style="display: none;">
+                <div class="section-header-compact">
+                    <div id="currentDateTime" class="current-datetime"></div>
+                </div>
+                
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">👥</div>
+                        <div class="stat-info">
+                            <div class="stat-value" id="totalClients">0</div>
+                            <div class="stat-label">Total Clienți</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">📅</div>
+                        <div class="stat-info">
+                            <div class="stat-value" id="todayAppointments">0</div>
+                            <div class="stat-label">Programări Astăzi</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">🔜</div>
+                        <div class="stat-info">
+                            <div class="stat-value" id="upcomingAppointments">0</div>
+                            <div class="stat-label">Viitoare (7 Zile)</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">⏰</div>
+                        <div class="stat-info">
+                            <div class="stat-value" id="totalHours">0</div>
+                            <div class="stat-label">Ore Viitoare</div>
+                        </div>
+                    </div>
+                    <div class="stat-card" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
+                        <div class="stat-icon">💰</div>
+                        <div class="stat-info">
+                            <div class="stat-value" id="monthlyRevenue">0 RON</div>
+                            <div class="stat-label">Venituri Luna Aceasta</div>
+                        </div>
+                    </div>
+                    <div class="stat-card" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);">
+                        <div class="stat-icon">🔄</div>
+                        <div class="stat-info">
+                            <div class="stat-value" id="recurringClients">0</div>
+                            <div class="stat-label">Clienți Recurenți</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Smart Features Status Panel - NEW -->
+                <div class="smart-features-status" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 20px; border-radius: 12px; margin: 20px 0; box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);">
+                    <h3 style="color: white; margin: 0 0 15px 0; display: flex; align-items: center; gap: 10px;">
+                        <span>✨</span>
+                        <span>Funcții Smart Active</span>
+                    </h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px;">
+                        <div style="background: rgba(255,255,255,0.95); padding: 15px; border-radius: 8px; display: flex; align-items: center; gap: 12px;">
+                            <span style="font-size: 2rem;">🔔</span>
+                            <div>
+                                <div style="font-weight: 700; color: #667eea; font-size: 1.1rem;">Smart Notifications</div>
+                                <div style="color: #666; font-size: 0.9rem;">Actualizare automată la fiecare 2 min</div>
+                            </div>
+                        </div>
+                        <div style="background: rgba(255,255,255,0.95); padding: 15px; border-radius: 8px; display: flex; align-items: center; gap: 12px;">
+                            <span style="font-size: 2rem;">🔍</span>
+                            <div>
+                                <div style="font-weight: 700; color: #667eea; font-size: 1.1rem;">Căutare Globală</div>
+                                <div style="color: #666; font-size: 0.9rem;">Apasă 'S' pentru activare rapidă</div>
+                            </div>
+                        </div>
+                        <div style="background: rgba(255,255,255,0.95); padding: 15px; border-radius: 8px; display: flex; align-items: center; gap: 12px;">
+                            <span style="font-size: 2rem;">💾</span>
+                            <div>
+                                <div style="font-weight: 700; color: #667eea; font-size: 1.1rem;">Auto-Backup</div>
+                                <div style="color: #666; font-size: 0.9rem;">Backup automat la fiecare 30 min</div>
+                            </div>
+                        </div>
+                        <div style="background: rgba(255,255,255,0.95); padding: 15px; border-radius: 8px; display: flex; align-items: center; gap: 12px;">
+                            <span style="font-size: 2rem;">⌨️</span>
+                            <div>
+                                <div style="font-weight: 700; color: #667eea; font-size: 1.1rem;">Keyboard Shortcuts</div>
+                                <div style="color: #666; font-size: 0.9rem;">N, C, F, S, D, P, K</div>
+                            </div>
+                        </div>
+                        <div style="background: rgba(255,255,255,0.95); padding: 15px; border-radius: 8px; display: flex; align-items: center; gap: 12px;">
+                            <span style="font-size: 2rem;">🏷️</span>
+                            <div>
+                                <div style="font-weight: 700; color: #667eea; font-size: 1.1rem;">Client Tags</div>
+                                <div style="color: #666; font-size: 0.9rem;">VIP, Recurent, Nou</div>
+                            </div>
+                        </div>
+                        <div style="background: rgba(255,255,255,0.95); padding: 15px; border-radius: 8px; display: flex; align-items: center; gap: 12px;">
+                            <span style="font-size: 2rem;">📊</span>
+                            <div>
+                                <div style="font-weight: 700; color: #667eea; font-size: 1.1rem;">Analytics & Reports</div>
+                                <div style="color: #666; font-size: 0.9rem;">PDF, CSV, Excel export</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="text-align: center; margin-top: 15px;">
+                        <button class="btn" style="background: white; color: #667eea; font-weight: 700; padding: 12px 24px; border: none; cursor: pointer; border-radius: 8px; font-size: 1rem; transition: transform 0.2s;" onclick="document.getElementById('settingsBtn').click();" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                            ⚙️ Vezi Toate Funcțiile în Setări
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Compact Smart Panel -->
+                <div class="smart-panel-compact">
+                    <div class="smart-panel-header">
+                        <h3>🔔 Notificări</h3>
+                        <button class="btn btn-secondary btn-sm" id="clearNotifications">Șterge</button>
+                    </div>
+                    <div id="smartNotifications" class="smart-notifications-compact"></div>
+                </div>
+
+                <!-- Quick Search -->
+                <div class="quick-search-panel-compact">
+                    <div class="quick-search-box">
+                        <span class="search-icon">🔍</span>
+                        <input type="text" id="globalSearch" placeholder="Caută rapid..." />
+                        <button class="btn btn-sm btn-primary" id="advancedSearchBtn">Avansat</button>
+                    </div>
+                    <div id="quickSearchResults" class="quick-search-results" style="display: none;"></div>
+                </div>
+
+                <div class="dashboard-content">
+                    <div class="dashboard-column">
+                        <h3>Programul de Astăzi</h3>
+                        <div id="todaySchedule" class="today-schedule"></div>
+                    </div>
+                    <div class="dashboard-column">
+                        <h3>Prezentare Săptămână</h3>
+                        <div id="weekOverview" class="week-overview"></div>
+                    </div>
+                </div>
+
+                <!-- Revenue Analytics - NEW -->
+                <div class="analytics-section">
+                    <!-- Revenue Chart Toggle -->
+                    <button class="analytics-toggle-btn" id="revenueChartToggleBtn" onclick="toggleRevenueChart()">
+                        📊 Grafic Venituri (Ultimele 6 Luni)
+                        <span class="toggle-arrow">▼</span>
+                    </button>
+                    
+                    <div id="revenueChartPanel" class="analytics-panel" style="display: none;">
+                        <div class="chart-container">
+                            <canvas id="revenueChart"></canvas>
+                        </div>
+                        <div class="chart-legend">
+                            <div class="legend-item">
+                                <span class="legend-color" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);"></span>
+                                <span>Venituri Lunare</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Business Intelligence - NEW -->
+                <div class="business-intelligence">
+                    <div class="bi-grid">
+                        <!-- Top Clients -->
+                        <div class="bi-card">
+                            <h3>🏆 Top 5 Clienți</h3>
+                            <p style="color: #64748b; font-size: 0.9rem; margin-bottom: 15px;">Cei mai profitabili clienți</p>
+                            <div id="topClientsChart" class="top-clients-list"></div>
+                        </div>
+                        
+                        <!-- Busy Days -->
+                        <div class="bi-card">
+                            <h3>📅 Zile Ocupate</h3>
+                            <p style="color: #64748b; font-size: 0.9rem; margin-bottom: 15px;">Cele mai solicitate zile</p>
+                            <div id="busyDaysChart" class="busy-days-list"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Export Reports - NEW -->
+                <div class="export-reports-section">
+                    <h3>📥 Export Rapoarte</h3>
+                    <div class="export-buttons-grid">
+                        <button class="btn btn-success" onclick="exportAppointmentsPDF()">
+                            📄 PDF Programări
+                        </button>
+                        <button class="btn btn-success" onclick="exportRevenuePDF()">
+                            📄 PDF Venituri
+                        </button>
+                        <button class="btn btn-success" onclick="exportClientsPDF()">
+                            📄 PDF Clienți
+                        </button>
+                        <button class="btn btn-success" onclick="exportFullReportPDF()">
+                            📊 PDF Raport Complet
+                        </button>
+                    </div>
+                    <div style="margin-top: 15px; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                        <button class="btn btn-secondary" onclick="exportAppointmentsReport()">
+                            📊 CSV Programări
+                        </button>
+                        <button class="btn btn-secondary" onclick="exportRevenueReport()">
+                            📊 CSV Venituri
+                        </button>
+                        <button class="btn btn-secondary" onclick="exportClientsReport()">
+                            📊 CSV Clienți
+                        </button>
+                        <button class="btn btn-secondary" onclick="exportFullReport()">
+                            📊 CSV Statistici
+                        </button>
+                    </div>
+                </div>
+
+                <div class="quick-actions">
+                    <h3>⚡ Acces Rapid</h3>
+                    <button class="btn btn-large btn-success" id="quickScheduleAppointment">
+                        <span class="btn-icon-large">➕</span>
+                        <span class="btn-content">
+                            <strong>Programare Nouă</strong>
+                            <small>Rezervă un client acum</small>
+                        </span>
+                    </button>
+                    <button class="btn btn-large btn-primary" id="quickAddClient">
+                        <span class="btn-icon-large">👤</span>
+                        <span class="btn-content">
+                            <strong>Adaugă Client</strong>
+                            <small>Creează profil nou client</small>
+                        </span>
+                    </button>
+                    <button class="btn btn-large btn-secondary" id="quickViewCalendar">
+                        <span class="btn-icon-large">📅</span>
+                        <span class="btn-content">
+                            <strong>Vezi Calendarul</strong>
+                            <small>Vezi toate rezervările</small>
+                        </span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Clients Section -->
+        <section id="clientsSection" class="section">
+            <div class="section-header">
+                <h2>Clienți</h2>
+                <div style="display: flex; gap: 10px;">
+                    <label class="btn btn-secondary" for="csvImportInput" style="margin: 0; cursor: pointer;" title="Import clienți din CSV">
+                        📥 Import CSV
+                    </label>
+                    <input type="file" id="csvImportInput" accept=".csv" style="display: none;">
+                    <button id="addClientBtn" class="btn btn-primary">+ Adaugă Client</button>
+                </div>
+            </div>
+            <div class="search-box">
+                <input type="text" id="clientSearch" placeholder="Caută clienți...">
+            </div>
+            <div id="clientsList" class="clients-list"></div>
+        </section>
+
+        <!-- Invoices Section -->
+        <section id="invoicesSection" class="section">
+            <div class="section-header">
+                <h2>💰 Facturi</h2>
+                <select id="invoiceFilter">
+                    <option value="all">Toate Facturile</option>
+                    <option value="unpaid">Neplătite</option>
+                    <option value="paid">Plătite</option>
+                    <option value="overdue">Întrziate</option>
+                </select>
+                <button class="btn btn-primary" id="addInvoiceBtn">📄 Creează Factură</button>
+            </div>
+            <div id="invoicesList"></div>
+        </section>
+
+        <!-- Quotations Section -->
+        <section id="quotationsSection" class="section">
+            <div class="section-header">
+                <h2>📄 Oferte Comerciale</h2>
+                <select id="quoteFilter">
+                    <option value="all">Toate Ofertele</option>
+                    <option value="draft">Ciorne</option>
+                    <option value="sent">Trimise</option>
+                    <option value="accepted">Acceptate</option>
+                    <option value="converted">Convertite</option>
+                </select>
+                <button class="btn btn-primary" id="addQuoteBtn">📋 Creează Ofertă</button>
+            </div>
+            <div id="quotationsContainer"></div>
+        </section>
+
+        <!-- Appointments Section -->
+        <section id="appointmentsSection" class="section">
+            <div class="section-header">
+                <h2>Programări</h2>
+                <button id="addAppointmentBtn" class="btn btn-primary">+ Programează</button>
+            </div>
+            <div class="filters">
+                <select id="appointmentFilter">
+                    <option value="all">Toate Programările</option>
+                    <option value="upcoming">Viitoare</option>
+                    <option value="today">Astăzi</option>
+                    <option value="past">Trecut</option>
+                </select>
+            </div>
+            <div id="appointmentsList" class="appointments-list"></div>
+        </section>
+
+        <!-- Calendar Section -->
+        <section id="calendarSection" class="section">
+            <div class="section-header">
+                <h2>Vizualizare Calendar</h2>
+                <div class="calendar-controls">
+                    <div class="view-toggle">
+                        <button id="monthViewBtn" class="btn btn-secondary active">Lună</button>
+                        <button id="weekViewBtn" class="btn btn-secondary">Săptămână</button>
+                        <button id="dayViewBtn" class="btn btn-secondary">Zi</button>
+                    </div>
+                    <div class="calendar-nav">
+                        <button id="prevPeriod" class="btn btn-secondary">←</button>
+                        <span id="currentPeriod"></span>
+                        <button id="nextPeriod" class="btn btn-secondary">→</button>
+                        <button id="todayBtn" class="btn btn-primary">Astăzi</button>
+                    </div>
+                </div>
+            </div>
+            <div id="calendar" class="calendar"></div>
+            <div id="weekView" class="week-view" style="display: none;"></div>
+            <div id="dayView" class="day-view" style="display: none;"></div>
+        </section>
+    </div>
+
+    <!-- Modal for Adding/Editing Client -->
+    <div id="clientModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2 id="clientModalTitle">Adaugă Client</h2>
+            <form id="clientForm">
+                <div class="form-group">
+                    <label for="clientName">👤 Nume Complet *</label>
+                    <input type="text" id="clientName" placeholder="ex: Ion Popescu" required autofocus>
+                    <small class="form-hint">Câmp obligatoriu</small>
+                </div>
+                <div class="form-group">
+                    <label for="clientPhone">📱 Număr Telefon *</label>
+                    <input type="tel" id="clientPhone" placeholder="ex: 0712345678" required>
+                    <small class="form-hint">Obligatoriu - folosit pentru confirmări SMS</small>
+                </div>
+                <div class="form-group">
+                    <label for="clientEmail">📧 Adresă Email</label>
+                    <input type="email" id="clientEmail" placeholder="ex: ion@exemplu.ro">
+                    <small class="form-hint">Opțional</small>
+                </div>
+                
+                <div class="form-group">
+                    <label for="clientTags">🏷️ Etichete</label>
+                    <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 8px;">
+                        <label style="display: inline-flex; align-items: center; gap: 5px; cursor: pointer; padding: 5px 10px; border: 2px solid #e0e0e0; border-radius: 5px; transition: all 0.2s;">
+                            <input type="checkbox" class="client-tag-checkbox" value="VIP" style="width: 18px; height: 18px;">
+                            <span style="font-weight: 600; color: #f59e0b;">⭐ VIP</span>
+                        </label>
+                        <label style="display: inline-flex; align-items: center; gap: 5px; cursor: pointer; padding: 5px 10px; border: 2px solid #e0e0e0; border-radius: 5px; transition: all 0.2s;">
+                            <input type="checkbox" class="client-tag-checkbox" value="Recurent" style="width: 18px; height: 18px;">
+                            <span style="font-weight: 600; color: #10b981;">🔄 Recurent</span>
+                        </label>
+                        <label style="display: inline-flex; align-items: center; gap: 5px; cursor: pointer; padding: 5px 10px; border: 2px solid #e0e0e0; border-radius: 5px; transition: all 0.2s;">
+                            <input type="checkbox" class="client-tag-checkbox" value="Nou" style="width: 18px; height: 18px;">
+                            <span style="font-weight: 600; color: #3b82f6;">✨ Nou</span>
+                        </label>
+                    </div>
+                    <small class="form-hint">Selectează etichetele pentru organizare</small>
+                </div>
+                
+                <div class="form-group">
+                    <label for="clientNotes">📝 Note & Preferințe</label>
+                    <textarea id="clientNotes" rows="3" placeholder="ex: Preferă dimineața, alergic la..."></textarea>
+                    <small class="form-hint">Notițe personale despre client (nu apar pe factură)</small>
+                </div>
+                
+                <h3 style="margin: 1.5rem 0 0.75rem; color: #667eea; font-size: 1.1rem; border-top: 2px solid #e0e0e0; padding-top: 1rem;">🏢 Date Fiscale (pentru eFactura)</h3>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="clientCUI">🏢 CUI/CIF</label>
+                        <input type="text" id="clientCUI" placeholder="ex: RO12345678">
+                        <small class="form-hint">Cod Unic de Înregistrare</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="clientRegCom">📜 Nr. Reg. Com.</label>
+                        <input type="text" id="clientRegCom" placeholder="ex: J40/1234/2020">
+                        <small class="form-hint">Număr Registrul Comerțului</small>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="clientAddress">🏠 Adresă Completă</label>
+                    <input type="text" id="clientAddress" placeholder="ex: Str. Exemplu Nr. 123, Bloc A1, Ap. 5">
+                    <small class="form-hint">Strada, număr, bloc, apartament</small>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="clientCity">🏛️ Oraș</label>
+                        <input type="text" id="clientCity" placeholder="ex: București">
+                    </div>
+                    <div class="form-group">
+                        <label for="clientCounty">🗺️ Județ/Sector</label>
+                        <input type="text" id="clientCounty" placeholder="ex: Sector 1 / Ilfov">
+                    </div>
+                    <div class="form-group">
+                        <label for="clientPostalCode">📮 Cod Poștal</label>
+                        <input type="text" id="clientPostalCode" placeholder="ex: 010101">
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="clientIBAN">💳 Cont IBAN</label>
+                        <input type="text" id="clientIBAN" placeholder="ex: RO49AAAA1B31007593840000">
+                        <small class="form-hint">Opțional - pentru facturare</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="clientBank">🏦 Bancă</label>
+                        <input type="text" id="clientBank" placeholder="ex: BCR, BRD, ING">
+                    </div>
+                </div>
+                
+                <h3 style="margin: 1.5rem 0 0.75rem; color: #667eea; font-size: 1.1rem; border-top: 2px solid #e0e0e0; padding-top: 1rem;">📝 Alte Informații</h3>
+                
+                <div class="form-group">
+                    <label for="clientTelegram">📨 Telegram Chat ID</label>
+                    <input type="text" id="clientTelegram" placeholder="ex: 123456789">
+                    <small class="form-hint">Opțional - Pentru mesaje gratuite prin Telegram (Vezi Setări pentru configurare bot)</small>
+                </div>
+                <div class="form-group">
+                    <label for="clientNotes">📝 Note Adiționale</label>
+                    <textarea id="clientNotes" rows="3" placeholder="Cerințe speciale, preferințe sau note despre acest client..."></textarea>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" id="cancelClientBtn">Anulează</button>
+                    <button type="submit" class="btn btn-primary">Salvează Client</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal for Adding/Editing Appointment -->
+    <div id="appointmentModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2 id="appointmentModalTitle">Programează Întâlnire</h2>
+            <form id="appointmentForm">
+                <div class="form-section">
+                    <h3 class="form-section-title">📋 Informații de Bază</h3>
+                    <div class="form-group">
+                        <label for="appointmentClient">👤 Selectează Client *</label>
+                        <select id="appointmentClient" required autofocus>
+                            <option value="">Alege un client din listă...</option>
+                        </select>
+                        <small class="form-hint">Nu găsești clientul? <a href="#" id="addClientFromAppointment" class="form-link">Adaugă client nou</a></small>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h3 class="form-section-title">📅 Când</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="appointmentDate">📅 Data *</label>
+                            <input type="date" id="appointmentDate" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="appointmentTime">⏰ Ora *</label>
+                            <select id="appointmentTime" required>
+                                <option value="">Selectează ora...</option>
+                                <option value="00:00">12:00 AM</option>
+                                <option value="00:15">12:15 AM</option>
+                                <option value="00:30">12:30 AM</option>
+                                <option value="00:45">12:45 AM</option>
+                                <option value="01:00">1:00 AM</option>
+                                <option value="01:15">1:15 AM</option>
+                                <option value="01:30">1:30 AM</option>
+                                <option value="01:45">1:45 AM</option>
+                                <option value="02:00">2:00 AM</option>
+                                <option value="02:15">2:15 AM</option>
+                                <option value="02:30">2:30 AM</option>
+                                <option value="02:45">2:45 AM</option>
+                                <option value="03:00">3:00 AM</option>
+                                <option value="03:15">3:15 AM</option>
+                                <option value="03:30">3:30 AM</option>
+                                <option value="03:45">3:45 AM</option>
+                                <option value="04:00">4:00 AM</option>
+                                <option value="04:15">4:15 AM</option>
+                                <option value="04:30">4:30 AM</option>
+                                <option value="04:45">4:45 AM</option>
+                                <option value="05:00">5:00 AM</option>
+                                <option value="05:15">5:15 AM</option>
+                                <option value="05:30">5:30 AM</option>
+                                <option value="05:45">5:45 AM</option>
+                                <option value="06:00">6:00 AM</option>
+                                <option value="06:15">6:15 AM</option>
+                                <option value="06:30">6:30 AM</option>
+                                <option value="06:45">6:45 AM</option>
+                                <option value="07:00">7:00 AM</option>
+                                <option value="07:15">7:15 AM</option>
+                                <option value="07:30">7:30 AM</option>
+                                <option value="07:45">7:45 AM</option>
+                                <option value="08:00">8:00 AM</option>
+                                <option value="08:15">8:15 AM</option>
+                                <option value="08:30">8:30 AM</option>
+                                <option value="08:45">8:45 AM</option>
+                                <option value="09:00">9:00 AM</option>
+                                <option value="09:15">9:15 AM</option>
+                                <option value="09:30">9:30 AM</option>
+                                <option value="09:45">9:45 AM</option>
+                                <option value="10:00">10:00 AM</option>
+                                <option value="10:15">10:15 AM</option>
+                                <option value="10:30">10:30 AM</option>
+                                <option value="10:45">10:45 AM</option>
+                                <option value="11:00">11:00 AM</option>
+                                <option value="11:15">11:15 AM</option>
+                                <option value="11:30">11:30 AM</option>
+                                <option value="11:45">11:45 AM</option>
+                                <option value="12:00">12:00 PM</option>
+                                <option value="12:15">12:15 PM</option>
+                                <option value="12:30">12:30 PM</option>
+                                <option value="12:45">12:45 PM</option>
+                                <option value="13:00">1:00 PM</option>
+                                <option value="13:15">1:15 PM</option>
+                                <option value="13:30">1:30 PM</option>
+                                <option value="13:45">1:45 PM</option>
+                                <option value="14:00">2:00 PM</option>
+                                <option value="14:15">2:15 PM</option>
+                                <option value="14:30">2:30 PM</option>
+                                <option value="14:45">2:45 PM</option>
+                                <option value="15:00">3:00 PM</option>
+                                <option value="15:15">3:15 PM</option>
+                                <option value="15:30">3:30 PM</option>
+                                <option value="15:45">3:45 PM</option>
+                                <option value="16:00">4:00 PM</option>
+                                <option value="16:15">4:15 PM</option>
+                                <option value="16:30">4:30 PM</option>
+                                <option value="16:45">4:45 PM</option>
+                                <option value="17:00">5:00 PM</option>
+                                <option value="17:15">5:15 PM</option>
+                                <option value="17:30">5:30 PM</option>
+                                <option value="17:45">5:45 PM</option>
+                                <option value="18:00">6:00 PM</option>
+                                <option value="18:15">6:15 PM</option>
+                                <option value="18:30">6:30 PM</option>
+                                <option value="18:45">6:45 PM</option>
+                                <option value="19:00">7:00 PM</option>
+                                <option value="19:15">7:15 PM</option>
+                                <option value="19:30">7:30 PM</option>
+                                <option value="19:45">7:45 PM</option>
+                                <option value="20:00">8:00 PM</option>
+                                <option value="20:15">8:15 PM</option>
+                                <option value="20:30">8:30 PM</option>
+                                <option value="20:45">8:45 PM</option>
+                                <option value="21:00">9:00 PM</option>
+                                <option value="21:15">9:15 PM</option>
+                                <option value="21:30">9:30 PM</option>
+                                <option value="21:45">9:45 PM</option>
+                                <option value="22:00">10:00 PM</option>
+                                <option value="22:15">10:15 PM</option>
+                                <option value="22:30">10:30 PM</option>
+                                <option value="22:45">10:45 PM</option>
+                                <option value="23:00">11:00 PM</option>
+                                <option value="23:15">11:15 PM</option>
+                                <option value="23:30">11:30 PM</option>
+                                <option value="23:45">11:45 PM</option>
+                            </select>
+                            <small class="form-hint" id="timeConflictWarning" style="color: #f44336; font-weight: 700; display: none;">⚠️ Conflict de timp! Există deja o programare la această oră.</small>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="appointmentDuration">⏱ Cât durează?</label>
+                        <select id="appointmentDuration">
+                            <option value="30">30 minute</option>
+                            <option value="60" selected>1 oră</option>
+                            <option value="90">1.5 ore</option>
+                            <option value="120">2 ore</option>
+                            <option value="150">2.5 ore</option>
+                            <option value="180">3 ore</option>
+                            <option value="210">3.5 ore</option>
+                            <option value="240">4 ore</option>
+                            <option value="270">4.5 ore</option>
+                            <option value="300">5 ore</option>
+                            <option value="330">5.5 ore</option>
+                            <option value="360">6 ore</option>
+                            <option value="390">6.5 ore</option>
+                            <option value="420">7 ore</option>
+                            <option value="450">7.5 ore</option>
+                            <option value="480">8 ore</option>
+                        </select>
+                    </div>
+                    <div id="existingAppointmentsInfo" style="background: #fff3e0; padding: 1rem; border-radius: 8px; border-left: 4px solid #ff9800; margin-top: 1rem; display: none;">
+                        <strong>📅 Programări existente în această zi:</strong>
+                        <div id="existingAppointmentsList" style="margin-top: 0.5rem; font-size: 0.95rem;"></div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h3 class="form-section-title">🔧 Detalii</h3>
+                    <div class="form-group">
+                        <label for="appointmentService">🔧 Tip Serviciu</label>
+                        <input type="text" id="appointmentService" placeholder="ex: Consultație, Tunsoare, Întâlnire, Sesiune...">
+                    </div>
+                    <div class="form-group">
+                        <label for="appointmentStatus">📊 Status</label>
+                        <select id="appointmentStatus">
+                            <option value="scheduled">⏰ Programat</option>
+                            <option value="confirmed">✅ Confirmat</option>
+                            <option value="completed">✔ Finalizat</option>
+                            <option value="cancelled">❌ Anulat</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="appointmentNotes">📝 Note Adiționale</label>
+                        <textarea id="appointmentNotes" rows="3" placeholder="Instrucțiuni speciale sau note pentru această programare..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="appointmentReminder">⏰ Reminder Automat</label>
+                        <select id="appointmentReminder">
+                            <option value="none">Fără reminder</option>
+                            <option value="1" selected>📅 Cu 1 zi înainte</option>
+                            <option value="3">📅 Cu 3 zile înainte</option>
+                            <option value="7">📅 Cu 7 zile înainte</option>
+                        </select>
+                        <small class="form-hint">Notificare automată la deschiderea aplicației</small>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="sms-confirmation-option">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="sendSmsConfirmation" checked>
+                            <span>📱 Trimite Confirmare SMS la Client</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" id="cancelAppointmentBtn">Anulează</button>
+                    <button type="submit" class="btn btn-primary">Salvează Programarea</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Invoice Modal -->
+    <div id="invoiceModal" class="modal">
+        <div class="modal-content modal-large">
+            <span class="close">&times;</span>
+            <h2 id="invoiceModalTitle">💼 Creează Factură Profesională</h2>
+            <form id="invoiceForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="invoiceClient">👤 Client *</label>
+                        <select id="invoiceClient" required>
+                            <option value="">Selectează un client</option>
+                        </select>
+                        <small class="form-hint">Nu găsești clientul? <a href="#" id="addClientFromInvoice" class="form-link">Adaugă client nou</a></small>
+                    </div>
+                    <div class="form-group">
+                        <label for="invoiceAppointment">📅 Programare Asociată (Opțional)</label>
+                        <select id="invoiceAppointment">
+                            <option value="">Niciuna - Factură Manuală</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <h3 style="margin: 1.5rem 0 1rem; color: #667eea; border-top: 2px solid #e0e0e0; padding-top: 1rem;">👤 Date Client pentru Factură</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="invoiceClientType">📋 Tip Client *</label>
+                        <select id="invoiceClientType" required onchange="toggleClientTypeFields('invoice')">
+                            <option value="">Selectează tip</option>
+                            <option value="firma">🏢 Firmă (CUI)</option>
+                            <option value="persoana">👤 Persoană Fizică (CNP)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="invoiceClientName">Nume Client *</label>
+                        <input type="text" id="invoiceClientName" placeholder="Auto-completat din client selectat sau completează manual" required>
+                        <small class="form-hint">Se auto-completează din client sau poți edita manual</small>
+                    </div>
+                </div>
+                
+                <div class="form-row" id="invoiceCUIRow">
+                    <div class="form-group">
+                        <label for="invoiceClientCUI">🏢 CUI/CIF</label>
+                        <input type="text" id="invoiceClientCUI" placeholder="ex: RO12345678">
+                    </div>
+                    <div class="form-group">
+                        <label for="invoiceClientRegCom">📜 Nr. Reg. Com.</label>
+                        <input type="text" id="invoiceClientRegCom" placeholder="ex: J40/1234/2020">
+                    </div>
+                </div>
+
+                <div class="form-row" id="invoiceCNPRow" style="display: none;">
+                    <div class="form-group">
+                        <label for="invoiceClientCNP">👤 CNP *</label>
+                        <input type="text" id="invoiceClientCNP" placeholder="ex: 1234567890123" maxlength="13">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="invoiceClientAddress">🏠 Adresă Completă</label>
+                    <input type="text" id="invoiceClientAddress" placeholder="ex: Str. Exemplu Nr. 123, Bloc A1, Ap. 5">
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="invoiceClientCity">🏛️ Oraș</label>
+                        <input type="text" id="invoiceClientCity" placeholder="ex: București">
+                    </div>
+                    <div class="form-group">
+                        <label for="invoiceClientCounty">🗺️ Județ/Sector</label>
+                        <input type="text" id="invoiceClientCounty" placeholder="ex: Sector 1">
+                    </div>
+                    <div class="form-group">
+                        <label for="invoiceClientPostalCode">📮 Cod Poștal</label>
+                        <input type="text" id="invoiceClientPostalCode" placeholder="ex: 010101">
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="invoiceClientPhone">📱 Telefon</label>
+                        <input type="tel" id="invoiceClientPhone" placeholder="ex: 0712345678">
+                    </div>
+                    <div class="form-group">
+                        <label for="invoiceClientEmail">📧 Email</label>
+                        <input type="email" id="invoiceClientEmail" placeholder="contact@client.ro">
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="invoiceClientIBAN">💳 Cont IBAN</label>
+                        <input type="text" id="invoiceClientIBAN" placeholder="ex: RO49AAAA1B31007593840000">
+                    </div>
+                    <div class="form-group">
+                        <label for="invoiceClientBank">🏦 Bancă</label>
+                        <input type="text" id="invoiceClientBank" placeholder="ex: BCR, BRD, ING">
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="invoiceNumber">🔢 Număr Factură</label>
+                        <input type="text" id="invoiceNumber" placeholder="Auto-generat dacă e gol">
+                    </div>
+                    <div class="form-group">
+                        <label for="invoiceDate">📅 Data Facturii *</label>
+                        <input type="date" id="invoiceDate" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="invoiceDueDate">📅 Data Scadență *</label>
+                        <input type="date" id="invoiceDueDate" required>
+                    </div>
+                </div>
+                
+                <div class="invoice-business-section">
+                    <h3 style="margin: 1.5rem 0 1rem; color: #667eea;">🏢 Detaliile Afacerii Tale</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="businessName">Nume Afacere</label>
+                            <input type="text" id="businessName" placeholder="Numele Afacerii Tale">
+                        </div>
+                        <div class="form-group">
+                            <label for="businessEmail">Email</label>
+                            <input type="email" id="businessEmail" placeholder="contact@afacere.ro">
+                        </div>
+                        <div class="form-group">
+                            <label for="businessPhone">Telefon</label>
+                            <input type="tel" id="businessPhone" placeholder="0712345678">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="businessAddress">Adresă</label>
+                        <textarea id="businessAddress" rows="2" placeholder="Str. Exemplu Nr. 123, București, Sector 1"></textarea>
+                    </div>
+                    <div class="form-row" style="border-top: 1px solid #ddd; padding-top: 1rem; margin-top: 1rem;">
+                        <div class="form-group">
+                            <label for="businessCUI">CUI/CIF (pentru e-factură)</label>
+                            <input type="text" id="businessCUI" placeholder="RO12345678" />
+                        </div>
+                        <div class="form-group">
+                            <label for="businessRegCom">Nr. Reg. Com.</label>
+                            <input type="text" id="businessRegCom" placeholder="J40/123/2024" />
+                        </div>
+                        <div class="form-group">
+                            <label for="businessCity">Oraș</label>
+                            <input type="text" id="businessCity" placeholder="București" />
+                        </div>
+                        <div class="form-group">
+                            <label for="businessCounty">Județ</label>
+                            <input type="text" id="businessCounty" placeholder="Sector 1" />
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="businessPostalCode">Cod Poștal</label>
+                            <input type="text" id="businessPostalCode" placeholder="010001" />
+                        </div>
+                        <div class="form-group">
+                            <label for="businessIBAN">IBAN</label>
+                            <input type="text" id="businessIBAN" placeholder="RO00XXXX..." />
+                        </div>
+                        <div class="form-group">
+                            <label for="businessBank">Bancă</label>
+                            <input type="text" id="businessBank" placeholder="Banca XYZ" />
+                        </div>
+                    </div>
+                </div>
+                
+                <h3 style="margin: 1.5rem 0 1rem; color: #667eea;">🛒 Articole/Servicii</h3>
+                <div id="invoiceItems"></div>
+                <button type="button" class="btn btn-secondary" id="addInvoiceItem" style="margin-bottom: 1rem;">➕ Adaugă Articol</button>
+                
+                <div class="invoice-calculations">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="invoiceDiscount">💰 Reducere (%)</label>
+                            <input type="number" id="invoiceDiscount" min="0" max="100" value="0" step="0.01">
+                        </div>
+                        <div class="form-group">
+                            <label for="invoiceTax">📊 Taxă/TVA (%)</label>
+                            <input type="number" id="invoiceTax" min="0" max="100" value="0" step="0.01">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="invoice-total-breakdown">
+                    <div class="total-row">
+                        <span>Subtotal:</span>
+                        <span><span id="invoiceSubtotal">0.00</span> Lei</span>
+                    </div>
+                    <div class="total-row">
+                        <span>Reducere:</span>
+                        <span>-<span id="invoiceDiscountAmount">0.00</span> Lei</span>
+                    </div>
+                    <div class="total-row">
+                        <span>Taxă/TVA:</span>
+                        <span>+<span id="invoiceTaxAmount">0.00</span> Lei</span>
+                    </div>
+                    <div class="total-row total-final">
+                        <span>Total:</span>
+                        <span><span id="invoiceTotal">0.00</span> Lei</span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="invoicePaymentTerms">💳 Termeni de Plată</label>
+                    <select id="invoicePaymentTerms">
+                        <option value="Due on receipt">La primire</option>
+                        <option value="Net 7">7 zile</option>
+                        <option value="Net 15">15 zile</option>
+                        <option value="Net 30" selected>30 zile</option>
+                        <option value="Net 60">60 zile</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="invoicePaymentMethod">💰 Metoda de Plată</label>
+                    <select id="invoicePaymentMethod">
+                        <option value="bank_transfer" selected>Transfer Bancar</option>
+                        <option value="cash">Numerar</option>
+                        <option value="card">Card</option>
+                        <option value="check">Cec</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="invoiceNotes">📝 Note & Instrucțiuni</label>
+                    <textarea id="invoiceNotes" rows="3" placeholder="Mulțumim pentru colaborare! Plata se poate face prin..."></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="invoiceStatus">📊 Status</label>
+                    <select id="invoiceStatus">
+                        <option value="unpaid">Neplătită</option>
+                        <option value="paid">Plătită</option>
+                        <option value="overdue">Întârziată</option>
+                        <option value="cancelled">Anulată</option>
+                    </select>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" id="cancelInvoiceBtn">Anulează</button>
+                    <button type="submit" class="btn btn-primary">💾 Salvează Factura</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Invoice Detail Modal -->
+    <div id="invoiceDetailModal" class="modal">
+        <div class="modal-content modal-large" style="display: flex; position: relative;">
+            <!-- ANAF Sidebar -->
+            <div id="invoiceANAFSidebar" class="invoice-anaf-sidebar">
+                <div style="padding: 1.5rem; display: flex; flex-direction: column; gap: 1rem; height: 100%;">
+                    <h3 style="margin: 0; color: #667eea; font-size: 1.1rem; text-align: center;">📋 ANAF</h3>
+                    <button type="button" class="btn btn-primary" id="submitInvoiceToANAFBtn" style="width: 100%; white-space: normal; height: auto; padding: 0.75rem 0.5rem; font-size: 0.85rem;">
+                        ▶ Trimite ANAF
+                    </button>
+                    <div id="invoiceANAFStatus" style="text-align: center; padding: 1rem; background: #f0f0f0; border-radius: 8px; min-height: 50px; display: flex; align-items: center; justify-content: center;">
+                        <span style="color: #999; font-size: 0.85rem;">Stare: -</span>
+                    </div>
+                    <div id="invoiceANAFInfo" style="font-size: 0.75rem; color: #666; padding-top: 1rem; border-top: 1px solid #ddd; line-height: 1.4;">
+                        <p style="margin: 0.5rem 0;"><strong>Document:</strong></p>
+                        <p id="invoiceNumberDisplay" style="margin: 0;">-</p>
+                        <p style="margin: 0.5rem 0 0 0;"><strong>Status:</strong></p>
+                        <p id="invoiceANAFStatusText" style="margin: 0; color: #999;">Neprocesată</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Main Content -->
+            <div style="flex: 1; display: flex; flex-direction: column; position: relative;">
+                <span class="close" style="position: absolute; top: 1rem; right: 1rem; z-index: 10;">&times;</span>
+                <h2 style="margin-top: 0;">💼 Detalii Factură</h2>
+                <div id="invoiceDetailContent" class="invoice-detail-content" style="flex: 1; overflow-y: auto;"></div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" id="closeInvoiceDetailBtn">Închide</button>
+                    <button type="button" class="btn btn-success" id="markAsPaidBtn">✅ Marchează Plătită</button>
+                    <button type="button" class="btn btn-info" id="downloadEfacturaPdfBtn" style="background-color: #0066cc;">📋 Descarcă eFactura PDF</button>
+                    <button type="button" class="btn btn-warning" id="downloadEfacturaXmlBtn" style="background-color: #eab308; color: #222;">🗎 Descarcă eFactura XML</button>
+                    <button type="button" class="btn btn-primary" id="printInvoiceBtn">🖨 Printează</button>
+                    <button type="button" class="btn btn-primary" id="editInvoiceBtn">✏ Editează</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <style>
+        .invoice-anaf-sidebar {
+            width: 200px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border-radius: 8px 0 0 8px;
+            border-right: 3px solid #667eea;
+        }
+        
+        #invoiceANAFStatus {
+            background: rgba(255, 255, 255, 0.2) !important;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            color: white;
+        }
+        
+        #invoiceANAFStatus.submitted {
+            background: #4caf50 !important;
+            color: white;
+        }
+        
+        #invoiceANAFStatus.submitted::before {
+            content: '✅ ';
+        }
+        
+        #invoiceANAFInfo {
+            color: rgba(255, 255, 255, 0.8);
+            background: rgba(0, 0, 0, 0.1);
+            padding: 1rem;
+            border-radius: 8px;
+            border-top: none;
+        }
+    </style>
+
+    <!-- Quotation Modal -->
+    <div id="quoteModal" class="modal">
+        <div class="modal-content modal-large">
+            <span class="close">&times;</span>
+            <h2 id="quoteModalTitle">📄 Creează Ofertă Comercială</h2>
+            <form id="quoteForm">
+                <!-- Business Info Section -->
+                <fieldset>
+                    <legend>📋 Emitent (Furnizor)</legend>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="businessNameQuote">Nume Firmă</label>
+                            <input type="text" id="businessNameQuote" required />
+                        </div>
+                        <div class="form-group">
+                            <label for="businessEmailQuote">Email</label>
+                            <input type="email" id="businessEmailQuote" />
+                        </div>
+                        <div class="form-group">
+                            <label for="businessPhoneQuote">Telefon</label>
+                            <input type="tel" id="businessPhoneQuote" />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="businessAddressQuote">Adresă</label>
+                        <textarea id="businessAddressQuote" rows="2" placeholder="Str. Exemplu Nr. 123, București, Sector 1"></textarea>
+                    </div>
+                    <div class="form-row" style="border-top: 1px solid #ddd; padding-top: 1rem; margin-top: 1rem;">
+                        <div class="form-group">
+                            <label for="businessCUIQuote">CUI/CIF</label>
+                            <input type="text" id="businessCUIQuote" placeholder="RO12345678" />
+                        </div>
+                        <div class="form-group">
+                            <label for="businessRegComQuote">Nr. Reg. Com.</label>
+                            <input type="text" id="businessRegComQuote" placeholder="J40/123/2024" />
+                        </div>
+                        <div class="form-group">
+                            <label for="businessCityQuote">Oraș</label>
+                            <input type="text" id="businessCityQuote" placeholder="București" />
+                        </div>
+                        <div class="form-group">
+                            <label for="businessCountyQuote">Județ</label>
+                            <input type="text" id="businessCountyQuote" placeholder="Sector 1" />
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="businessPostalCodeQuote">Cod Poștal</label>
+                            <input type="text" id="businessPostalCodeQuote" placeholder="010001" />
+                        </div>
+                        <div class="form-group">
+                            <label for="businessIBANQuote">IBAN</label>
+                            <input type="text" id="businessIBANQuote" placeholder="RO00XXXX..." />
+                        </div>
+                        <div class="form-group">
+                            <label for="businessBankQuote">Bancă</label>
+                            <input type="text" id="businessBankQuote" placeholder="Banca XYZ" />
+                        </div>
+                    </div>
+                </fieldset>
+
+                <!-- Client Section -->
+                <fieldset>
+                    <legend>👤 Client (Plătitor)</legend>
+                    <div class="form-group">
+                        <label for="quoteClient">Selectează Client *</label>
+                        <select id="quoteClient" required></select>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="quoteClientType">📋 Tip Client *</label>
+                            <select id="quoteClientType" required onchange="toggleClientTypeFields('quote')">
+                                <option value="">Selectează tip</option>
+                                <option value="firma">🏢 Firmă (CUI)</option>
+                                <option value="persoana">👤 Persoană Fizică (CNP)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="quoteClientName">Nume Client</label>
+                            <input type="text" id="quoteClientName" required />
+                        </div>
+                    </div>
+                    <div class="form-row" id="quoteCUIRow">
+                        <div class="form-group">
+                            <label for="quoteClientCUI">CUI/CIF</label>
+                            <input type="text" id="quoteClientCUI" />
+                        </div>
+                        <div class="form-group">
+                            <label for="quoteClientRegCom">Reg. Com.</label>
+                            <input type="text" id="quoteClientRegCom" />
+                        </div>
+                    </div>
+
+                    <div class="form-row" id="quoteCNPRow" style="display: none;">
+                        <div class="form-group">
+                            <label for="quoteClientCNP">👤 CNP *</label>
+                            <input type="text" id="quoteClientCNP" placeholder="ex: 1234567890123" maxlength="13" />
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="quoteClientAddress">Adresă Client</label>
+                            <input type="text" id="quoteClientAddress" />
+                        </div>
+                    </div>
+                    <div class="form-row">\n                        <div class="form-group">
+                            <label for="quoteClientCity">Oraș</label>
+                            <input type="text" id="quoteClientCity" />
+                        </div>
+                        <div class="form-group">
+                            <label for="quoteClientCounty">Județ</label>
+                            <input type="text" id="quoteClientCounty" />
+                        </div>
+                        <div class="form-group">
+                            <label for="quoteClientPostalCode">Cod Poștal</label>
+                            <input type="text" id="quoteClientPostalCode" />
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="quoteClientPhone">📱 Telefon</label>
+                            <input type="tel" id="quoteClientPhone" />
+                        </div>
+                        <div class="form-group">
+                            <label for="quoteClientEmail">📧 Email</label>
+                            <input type="email" id="quoteClientEmail" />
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="quoteClientIBAN">💳 Cont IBAN</label>
+                            <input type="text" id="quoteClientIBAN" />
+                        </div>
+                        <div class="form-group">
+                            <label for="quoteClientBank">🏦 Bancă</label>
+                            <input type="text" id="quoteClientBank" />
+                        </div>
+                    </div>
+                </fieldset>
+
+                <!-- Quote Details -->
+                <fieldset>
+                    <legend>📊 Detalii Ofertă</legend>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="quoteNumber">Nr. Ofertă</label>
+                            <input type="text" id="quoteNumber" readonly />
+                        </div>
+                        <div class="form-group">
+                            <label for="quoteDate">Data Ofertei</label>
+                            <input type="date" id="quoteDate" required />
+                        </div>
+                        <div class="form-group">
+                            <label for="quoteDueDate">Valabilă până</label>
+                            <input type="date" id="quoteDueDate" required />
+                        </div>
+                    </div>
+                </fieldset>
+
+                <!-- Items/Services Section -->
+                <h3 style="margin: 1.5rem 0 1rem; color: #667eea; border-top: 2px solid #e0e0e0; padding-top: 1rem;">🛒 Articole/Servicii</h3>
+                <div id="quoteItems" style="min-height: 50px; border: 1px dashed #ccc; padding: 10px; border-radius: 8px;"></div>
+                <button type="button" class="btn btn-secondary" id="addQuoteItem" style="margin-bottom: 1rem; margin-top: 10px;">➕ Adaugă Articol/Serviciu</button>
+
+                <!-- Calculations -->
+                <div class="invoice-calculations">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="quoteDiscount">💰 Reducere (%)</label>
+                            <input type="number" id="quoteDiscount" min="0" max="100" value="0" step="0.01">
+                        </div>
+                        <div class="form-group">
+                            <label for="quoteTax">📊 Taxă/TVA (%)</label>
+                            <input type="number" id="quoteTax" min="0" max="100" value="19" step="0.01">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="invoice-total-breakdown">
+                    <div class="total-row">
+                        <span>Subtotal:</span>
+                        <span><span id="quoteSubtotal">0.00</span> Lei</span>
+                    </div>
+                    <div class="total-row">
+                        <span>Reducere:</span>
+                        <span>-<span id="quoteDiscountAmount">0.00</span> Lei</span>
+                    </div>
+                    <div class="total-row">
+                        <span>Taxă/TVA:</span>
+                        <span>+<span id="quoteTaxAmount">0.00</span> Lei</span>
+                    </div>
+                    <div class="total-row total-final">
+                        <span>Total:</span>
+                        <span><span id="quoteTotal">0.00</span> Lei</span>
+                    </div>
+                </div>
+
+                <!-- Notes -->
+                <fieldset>
+                    <legend>📝 Note & Observații</legend>
+                    <textarea id="quoteNotes" placeholder="Condiții comerciale, termeni de livrare, observații..." rows="3"></textarea>
+                </fieldset>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">💾 Salvează Ofertă</button>
+                    <button type="button" class="btn btn-secondary" id="cancelQuoteBtn">Anulează</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Quotation Detail Modal -->
+    <div id="quoteDetailModal" class="modal">
+        <div class="modal-content modal-large">
+            <span class="close">&times;</span>
+            <h2>📄 Detalii Ofertă</h2>
+            <div id="quoteDetailContent" class="quote-detail-content"></div>
+            <div class="form-actions">
+                <button type="button" class="btn btn-secondary" id="closeQuoteDetailBtn">Închide</button>
+                <button type="button" class="btn btn-warning" onclick="downloadQuotePDF(document.getElementById('quoteDetailContent').dataset.quoteId)">📄 Descarcă PDF</button>
+                <button type="button" class="btn btn-success" onclick="convertQuoteToInvoice(document.getElementById('quoteDetailContent').dataset.quoteId)">💰 Convertir în Factură</button>
+                <button type="button" class="btn btn-primary" onclick="editQuote(document.getElementById('quoteDetailContent').dataset.quoteId)">✏ Editează</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Appointment Detail Modal -->
+    <div id="appointmentDetailModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Detalii Programare</h2>
+            <div id="appointmentDetailContent" class="appointment-detail-content"></div>
+            <div class="form-actions">
+                <button type="button" class="btn btn-secondary" id="closeDetailBtn">Închide</button>
+                <button type="button" class="btn btn-success" id="sendSmsBtn">📱 Trimite SMS Reminder</button>
+                <button type="button" class="btn btn-warning" id="createInvoiceFromAppointment">💰 Creează Factură</button>
+                <button type="button" class="btn btn-primary" id="printAppointmentBtn">🖨 Printează</button>
+                <button type="button" class="btn btn-primary" id="editFromDetailBtn">✏ Editează</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sync Instructions Modal - DISABLED -->
+    <div id="syncInfoModal" class="modal" style="display: none !important;">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>🔄 Sincronizare Ușoară Desktop ↔️ Mobil</h2>
+            
+            <div style="background: #e8f5e9; padding: 20px; border-radius: 8px; margin-bottom: 20px; border: 2px solid #4caf50;">
+                <h3 style="color: #2e7d32; margin-top: 0;">✅ Cum se folosește:</h3>
+                <div style="color: #1b5e20; line-height: 2;">
+                    <p><strong>Pe Desktop:</strong></p>
+                    <ul style="margin: 5px 0 15px 20px;">
+                        <li>📤 <strong>Trimite la Mobil</strong> - Trimite datele de pe desktop la mobil</li>
+                        <li>📥 <strong>Preia de la Mobil</strong> - Aduce datele de pe mobil pe desktop</li>
+                    </ul>
+                    <p><strong>Pe Mobil:</strong></p>
+                    <ul style="margin: 5px 0 0 20px;">
+                        <li>📤 <strong>Trimite la Desktop</strong> - Trimite datele de pe mobil la desktop</li>
+                        <li>📥 <strong>Preia de la Desktop</strong> - Aduce datele de pe desktop pe mobil</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div style="background: #e3f2fd; padding: 20px; border-radius: 8px; border: 2px solid #2196f3;">
+                <h3 style="color: #1976d2; margin-top: 0;">📱 Configurare (O Singură Dată):</h3>
+                <ol style="color: #555; margin: 10px 0 0 20px; line-height: 1.8;">
+                    <li>Deschide aplicația pe desktop: <code>http://localhost:8080</code></li>
+                    <li>Pe mobil, conectează-te la aceeași rețea WiFi</li>
+                    <li>Pe mobil, deschide: <code>http://[ip-ul-pc-ului]:8080</code></li>
+                    <li>Folosește butoanele Trimite/Preia pentru sincronizare!</li>
+                </ol>
+            </div>
+
+            <div style="background: #fff3e0; padding: 15px; border-radius: 8px; margin-top: 20px; border-left: 4px solid #ff9800;">
+                <strong style="color: #e65100;">ℹ️ Notă:</strong>
+                <p style="color: #374151; font-weight: 600; margin: 8px 0 0 0; line-height: 1.6;">
+                    Ambele dispozitive trebuie să fie pe aceeași rețea WiFi pentru sincronizare.<br>
+                    Datele se sincronizează instant cu un singur click!
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Section -->
+    <section id="settingsSection" class="section">
+        <div class="section-header">
+            <h2>⚙️ Setări Aplicație</h2>
+        </div>
+        
+        <div class="settings-container">
+            <div class="settings-card">
+                <h3>📱 Telegram Bot - Mesaje Gratuite</h3>
+                <p>Trimite mesaje gratuite către clienți prin Telegram. Fără limită, complet gratuit!</p>
+                
+                <div class="form-group">
+                    <label for="telegramBotToken">🔑 Telegram Bot Token</label>
+                    <input type="password" id="telegramBotToken" placeholder="Introdu token-ul primit de la @BotFather">
+                    <small class="form-hint">
+                        Nu ai bot? Deschide Telegram → Caută <strong>@BotFather</strong> → Scrie <code>/newbot</code>
+                    </small>
+                </div>
+                
+                <div class="form-actions">
+                    <button class="btn btn-primary" onclick="saveTelegramToken()">💾 Salvează Token</button>
+                    <button class="btn btn-secondary" onclick="testTelegramConnection()">🧪 Testează Conexiunea</button>
+                </div>
+                
+                <div id="telegramStatus" class="status-message" style="margin-top: 15px;"></div>
+                
+                <div style="background: #e3f2fd; padding: 15px; border-radius: 8px; margin-top: 20px;">
+                    <h4 style="color: #1976d2; margin-top: 0;">📘 Cum funcționează:</h4>
+                    <ol style="color: #555; margin: 10px 0 0 20px; line-height: 1.8;">
+                        <li>Creează bot în Telegram cu @BotFather</li>
+                        <li>Copiază și salvează token-ul aici</li>
+                        <li>Clientul caută botul tău în Telegram și apasă START</li>
+                        <li>Botul îi dă un Chat ID (număr)</li>
+                        <li>Adaugi Chat ID-ul în profilul clientului</li>
+                        <li>Gata! Trimiți mesaje gratuit cu un click! 🎉</li>
+                    </ol>
+                    <p style="margin-top: 15px; color: #1f2937; font-weight: 600;">
+                        <strong>Vezi ghidul complet:</strong> <a href="telegram-setup.md" target="_blank" style="color: #1976d2;">telegram-setup.md</a>
+                    </p>
+                </div>
+            </div>
+
+            <!-- Quick Actions Panel - NEW -->
+            <div class="settings-card" style="margin-top: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                <h3 style="color: white;">⚡ Acțiuni Rapide Smart</h3>
+                <p style="color: rgba(255,255,255,0.9); font-weight: 600; font-size: 1.05rem;">Accesează rapid funcțiile avansate:</p>
+                
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-top: 20px;">
+                    <button class="btn" style="background: white; color: #667eea; font-weight: 700; padding: 15px; border: none; cursor: pointer; transition: transform 0.2s;" onclick="document.getElementById('smartRemindersBtn').click()" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                        ⏰ Smart Reminders
+                    </button>
+                    <button class="btn" style="background: white; color: #667eea; font-weight: 700; padding: 15px; border: none; cursor: pointer; transition: transform 0.2s;" onclick="document.getElementById('globalSearch').focus()" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                        🔍 Căutare Globală
+                    </button>
+                    <button class="btn" style="background: white; color: #667eea; font-weight: 700; padding: 15px; border: none; cursor: pointer; transition: transform 0.2s;" onclick="document.getElementById('darkModeToggle').click()" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                        🌙 Toggle Dark Mode
+                    </button>
+                    <button class="btn" style="background: white; color: #667eea; font-weight: 700; padding: 15px; border: none; cursor: pointer; transition: transform 0.2s;" onclick="toggleRevenueChart()" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                        📊 Grafic Venituri
+                    </button>
+                    <button class="btn" style="background: white; color: #667eea; font-weight: 700; padding: 15px; border: none; cursor: pointer; transition: transform 0.2s;" onclick="exportFullReportPDF()" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                        📄 Raport PDF Complet
+                    </button>
+                    <button class="btn" style="background: white; color: #667eea; font-weight: 700; padding: 15px; border: none; cursor: pointer; transition: transform 0.2s;" onclick="createBackup(); showNotification('💾 Backup manual creat!', 'success')" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                        💾 Backup Manual
+                    </button>
+                </div>
+            </div>
+
+            <!-- Funcții Smart - NEW -->
+            <div class="settings-card" style="margin-top: 20px;">
+                <h3>🚀 Funcții Smart - Ghid Rapid</h3>
+                <p style="color: #1f2937; font-weight: 600; font-size: 1.05rem;">Toate funcțiile sunt deja integrate în aplicație! Iată unde le găsești:</p>
+                
+                <!-- Tags & Notes -->
+                <div style="background: #f0fdf4; padding: 15px; border-radius: 8px; margin-top: 15px; border-left: 4px solid #10b981;">
+                    <h4 style="color: #047857; margin-top: 0;">🏷️ Tags & Note Clienți</h4>
+                    <p style="color: #1f2937; font-weight: 600; margin: 8px 0;">
+                        <strong>📍 Unde:</strong> La adăugare/editare client (apasă pe orice client sau butonul "➕ Client Nou")
+                    </p>
+                    <p style="color: #374151; font-weight: 600; margin: 8px 0;">
+                        ⭐ <span style="color: #dc2626; font-weight: 700;">VIP</span> - Clienți importanți<br>
+                        🔄 <span style="color: #2563eb; font-weight: 700;">Recurent</span> - Clienți fideli<br>
+                        ✨ <span style="color: #16a34a; font-weight: 700;">Nou</span> - Clienți noi (auto pentru CSV import)
+                    </p>
+                    <p style="color: #1f2937; font-weight: 600; margin: 8px 0 0 0;">
+                        📝 Secțiunea <strong>"Note & Preferințe"</strong> - scrie orice despre client!
+                    </p>
+                    <div style="background: #fff; padding: 10px; border-radius: 5px; margin-top: 10px; border: 2px solid #10b981;">
+                        <small style="color: #047857; font-weight: 700;">💡 TIP: Tag-urile apar lângă numele clientului în listă!</small>
+                    </div>
+                </div>
+
+                <!-- Reminders -->
+                <div style="background: #fef2f2; padding: 15px; border-radius: 8px; margin-top: 15px; border-left: 4px solid #ef4444;">
+                    <h4 style="color: #b91c1c; margin-top: 0;">🔔 Reminder-uri Programări</h4>
+                    <p style="color: #1f2937; font-weight: 600; margin: 8px 0;">
+                        <strong>📍 Unde:</strong> În formularul de programare nouă (butonul "➕ Programare Nouă")
+                    </p>
+                    <p style="color: #374151; font-weight: 600; margin: 8px 0;">
+                        Găsești selectul <strong>"⏰ Reminder Automat"</strong> cu opțiunile:<br>
+                        • Fără reminder<br>
+                        • Cu 1 zi înainte (selectat automat)<br>
+                        • Cu 3 zile înainte<br>
+                        • Cu 7 zile înainte
+                    </p>
+                    <div style="background: #fff; padding: 10px; border-radius: 5px; margin-top: 10px; border: 2px solid #ef4444;">
+                        <small style="color: #b91c1c; font-weight: 700;">💡 TIP: Reminder-urile apar în secțiunea 🔔 Notificări!</small>
+                    </div>
+                </div>
+
+                <!-- Import CSV -->
+                <div style="background: #f0f9ff; padding: 15px; border-radius: 8px; margin-top: 15px; border-left: 4px solid #0ea5e9;">
+                    <h4 style="color: #0369a1; margin-top: 0;">📥 Import CSV Clienți</h4>
+                    <p style="color: #1f2937; font-weight: 600; margin: 8px 0;">
+                        <strong>📍 Unde:</strong> În secțiunea "👥 Clienți" → butonul <strong>"📂 Import CSV"</strong>
+                    </p>
+                    <p style="color: #374151; font-weight: 600; margin: 8px 0;">
+                        Fișierul CSV trebuie să aibă formatul:<br>
+                        <code style="background: #e0f2fe; padding: 2px 6px; border-radius: 3px; color: #0369a1;">nume,telefon,email</code><br>
+                        <code style="background: #e0f2fe; padding: 2px 6px; border-radius: 3px; color: #0369a1;">Ion Popescu,0712345678,ion@email.ro</code>
+                    </p>
+                    <button class="btn btn-primary" onclick="document.getElementById('csvImportInput').click()" style="margin-top: 10px;">
+                        📂 Import CSV Acum
+                    </button>
+                    <div style="background: #fff; padding: 10px; border-radius: 5px; margin-top: 10px; border: 2px solid #0ea5e9;">
+                        <small style="color: #0369a1; font-weight: 700;">💡 TIP: Toți clienții importați primesc automat tag-ul ✨ Nou și sunt verificați pentru duplicați!</small>
+                    </div>
+                </div>
+
+                <!-- Keyboard Shortcuts -->
+                <div style="background: #fef3c7; padding: 15px; border-radius: 8px; margin-top: 15px; border-left: 4px solid #f59e0b;">
+                    <h4 style="color: #b45309; margin-top: 0;">⌨️ Comenzi Rapide Tastatură</h4>
+                    <p style="color: #1f2937; font-weight: 600; margin: 8px 0;">
+                        <strong>📍 Funcționează oriunde:</strong> Apasă tastele de mai jos pentru acțiuni rapide!
+                    </p>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; color: #1f2937; font-weight: 600;">
+                        <div>• <kbd style="background: #fff; padding: 4px 10px; border: 2px solid #d97706; border-radius: 4px; font-weight: 700; font-size: 1.1rem;">N</kbd> → Programare nouă</div>
+                        <div>• <kbd style="background: #fff; padding: 4px 10px; border: 2px solid #d97706; border-radius: 4px; font-weight: 700; font-size: 1.1rem;">C</kbd> → Client nou</div>
+                        <div>• <kbd style="background: #fff; padding: 4px 10px; border: 2px solid #d97706; border-radius: 4px; font-weight: 700; font-size: 1.1rem;">F</kbd> → Factură nouă</div>
+                        <div>• <kbd style="background: #fff; padding: 4px 10px; border: 2px solid #d97706; border-radius: 4px; font-weight: 700; font-size: 1.1rem;">S</kbd> → Căutare globală</div>
+                        <div>• <kbd style="background: #fff; padding: 4px 10px; border: 2px solid #d97706; border-radius: 4px; font-weight: 700; font-size: 1.1rem;">D</kbd> → Dark mode</div>
+                        <div>• <kbd style="background: #fff; padding: 4px 10px; border: 2px solid #d97706; border-radius: 4px; font-weight: 700; font-size: 1.1rem;">P</kbd> → Push date sync</div>
+                        <div>• <kbd style="background: #fff; padding: 4px 10px; border: 2px solid #d97706; border-radius: 4px; font-weight: 700; font-size: 1.1rem;">K</kbd> → Vezi toate comenzile</div>
+                    </div>
+                    <div style="background: #fff; padding: 10px; border-radius: 5px; margin-top: 10px; border: 2px solid #f59e0b;">
+                        <small style="color: #b45309; font-weight: 700;">💡 TIP: Apasă K pentru a vedea toate shortcut-urile disponibile!</small>
+                    </div>
+                </div>
+
+                <!-- Service Colors -->
+                <div style="background: #faf5ff; padding: 15px; border-radius: 8px; margin-top: 15px; border-left: 4px solid #a855f7;">
+                    <h4 style="color: #7e22ce; margin-top: 0;">🎨 Colorare Servicii în Calendar</h4>
+                    <p style="color: #1f2937; font-weight: 600; margin: 8px 0;">
+                        <strong>📍 Unde:</strong> Vizualizările Calendar Săptămână și Calendar Zi
+                    </p>
+                    <p style="color: #374151; font-weight: 600; margin: 8px 0;">
+                        Fiecare serviciu are culoare unică generată automat pentru identificare rapidă!
+                    </p>
+                    <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px;">
+                        <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 8px 12px; border-radius: 6px; font-weight: 700; font-size: 0.85rem; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">Coafură</div>
+                        <div style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; padding: 8px 12px; border-radius: 6px; font-weight: 700; font-size: 0.85rem; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">Manichiură</div>
+                        <div style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white; padding: 8px 12px; border-radius: 6px; font-weight: 700; font-size: 0.85rem; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">Masaj</div>
+                        <div style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); color: white; padding: 8px 12px; border-radius: 6px; font-weight: 700; font-size: 0.85rem; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">Consultanță</div>
+                    </div>
+                    <div style="background: #fff; padding: 10px; border-radius: 5px; margin-top: 10px; border: 2px solid #a855f7;">
+                        <small style="color: #7e22ce; font-weight: 700;">💡 TIP: Mergi în Calendar → Săptămână pentru a vedea culorile!</small>
+                    </div>
+                </div>
+
+                <!-- Duplicate Detection -->
+                <div style="background: #fff7ed; padding: 15px; border-radius: 8px; margin-top: 15px; border-left: 4px solid #f97316;">
+                    <h4 style="color: #c2410c; margin-top: 0;">🔍 Detectare Automată Duplicați</h4>
+                    <p style="color: #1f2937; font-weight: 600; margin: 8px 0;">
+                        <strong>📍 Când:</strong> Automat la adăugare client nou
+                    </p>
+                    <p style="color: #374151; font-weight: 600; margin: 8px 0;">
+                        Dacă un client are nume foarte similar cu unul existent (>70% asemănare), vei primi o alertă!
+                    </p>
+                    <div style="background: #fff; padding: 10px; border-radius: 5px; margin-top: 10px; border: 2px solid #f97316;">
+                        <small style="color: #c2410c; font-weight: 700;">💡 TIP: Te ajută să eviți dubluri accidentale!</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Floating Action Buttons - ALWAYS VISIBLE -->
+    <div class="fab-container">
+        <button class="fab fab-primary" onclick="document.getElementById('addAppointmentBtn').click()" title="Programare Nouă (Apasă N)">
+            <span class="fab-icon">📅</span>
+            <span class="fab-label">Programare</span>
+        </button>
+        <button class="fab fab-secondary" onclick="document.getElementById('addClientBtn').click()" title="Client Nou (Apasă C)">
+            <span class="fab-icon">👤</span>
+            <span class="fab-label">Client</span>
+        </button>
+    </div>
+
+    <input type="file" id="hiddenImportInput" accept=".json" style="display: none;">
+
+    <script src="app.js"></script>
+    <script src="efactura-pdf.js"></script>
+    <script src="fix-quotes-handler.js"></script>
+    <script src="mobile-invoice-quote-optimize.js"></script>
+    <script src="form-validation-alerts.js"></script>
+</body>
+</html>
+<!-- Cache Buster: 20260131 -->

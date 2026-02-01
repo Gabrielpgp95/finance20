@@ -1,0 +1,39 @@
+{
+  "clients": [
+    {
+      "id": 1769723554431,
+      "name": "Gabriel Prunaru",
+      "email": "PETREGABRIEL95@gmail.com",
+      "phone": "+40722551162",
+      "notes": "",
+      "createdAt": "2026-01-29T21:52:34.431Z"
+    },
+    {
+      "id": 1769723849280,
+      "name": "Gabriel Prunaru",
+      "email": "PETREGABRIEL95@gmail.com",
+      "phone": "+40722551162",
+      "notes": "d",
+      "createdAt": "2026-01-29T21:57:29.280Z"
+    }
+  ],
+  "appointments": [],
+  "invoices": [],
+  "quotations": [],
+  "businessInfo": {
+    "name": "Your Business Name",
+    "email": "business@example.com",
+    "phone": "(555) 123-4567",
+    "address": "123 Main Street\nCity, State ZIP",
+    "cui": "",
+    "regCom": "",
+    "city": "City",
+    "county": "County",
+    "postalCode": "00000",
+    "iban": "",
+    "bank": "",
+    "invoiceSeries": "INV",
+    "quoteSeriesPrefix": "OFR"
+  },
+  "timestamp": 1769724201885
+}

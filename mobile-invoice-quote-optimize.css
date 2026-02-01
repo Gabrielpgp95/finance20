@@ -1,0 +1,1176 @@
+/* ============================================
+   MOBILE OPTIMIZATION FOR INVOICE & QUOTE MODALS
+   ============================================= */
+
+/* Desktop - No changes */
+@media (min-width: 769px) {
+    /* Keep existing styles */
+}
+
+/* ==========================================
+   TABLETS (768px - 1024px)
+   ========================================== */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .modal-content.modal-large {
+        max-width: 95% !important;
+        max-height: 90vh !important;
+    }
+
+    .invoice-item-row {
+        grid-template-columns: 1.5fr 1fr 1fr auto;
+        gap: 0.75rem;
+    }
+
+    .form-row {
+        gap: 10px;
+    }
+
+    .form-row .form-group {
+        min-width: 150px;
+    }
+}
+
+/* ==========================================
+   MOBILE (max 768px)
+   ========================================== */
+@media (max-width: 768px) {
+    /* -------- INVOICE & QUOTE MODALS -------- */
+    
+    .modal {
+        display: flex;
+        align-items: flex-end;
+        justify-content: center;
+    }
+
+    .modal.show {
+        background-color: rgba(0, 0, 0, 0.6);
+    }
+
+    /* Modal Content - Fullscreen Pop-up */
+    .modal-content {
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: 0 !important;
+        padding: 15px !important;
+        border-radius: 16px 16px 0 0 !important;
+        max-height: 92vh !important;
+        height: auto !important;
+        overflow-y: auto !important;
+        overflow-x: hidden !important;
+        -webkit-overflow-scrolling: touch;
+        animation: slideUpMobile 0.3s ease-out;
+        box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
+        position: relative;
+        will-change: transform;
+        transform: translateZ(0);
+        backface-visibility: hidden;
+        scroll-behavior: smooth;
+    }
+    
+    /* Quote Modal - Extra smooth scrolling */
+    #quoteModal .modal-content,
+    #invoiceModal .modal-content {
+        scroll-padding-top: 20px;
+        overscroll-behavior: contain;
+    }
+
+    @keyframes slideUpMobile {
+        from {
+            transform: translateY(100%);
+            opacity: 0;
+        }
+        to {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    }
+
+    /* Close Button - More Accessible */
+    .close {
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        font-size: 32px;
+        z-index: 1001;
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 50%;
+        width: 44px;
+        height: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+        line-height: 1;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+        transition: all 0.2s;
+    }
+
+    .close:hover {
+        background: white;
+        transform: rotate(90deg);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    .close:active {
+        transform: rotate(90deg) scale(0.95);
+    }
+
+    /* Modal Title */
+    .modal-content h2 {
+        font-size: 1.3rem !important;
+        margin-bottom: 15px !important;
+        margin-top: 30px !important;
+        color: #333;
+        word-wrap: break-word;
+        padding-right: 40px;
+    }
+
+    /* -------- FORM SECTIONS -------- */
+
+    /* Form Group - Single Column */
+    .form-group {
+        margin-bottom: 12px !important;
+        width: 100%;
+        will-change: auto;
+        contain: layout style;
+    }
+
+    .form-group label {
+        font-size: 0.9rem !important;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 6px !important;
+        display: block;
+        will-change: auto;
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+        font-size: 16px !important; /* Prevents iOS zoom */
+        width: 100% !important;
+        padding: 10px 12px !important;
+        border: 2px solid #e0e0e0 !important;
+        border-radius: 6px !important;
+        box-sizing: border-box;
+        touch-action: manipulation;
+        transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        will-change: auto;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+        border-color: #667eea !important;
+        background: #f8f9ff;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        outline: none;
+    }
+
+    .form-group input::placeholder {
+        font-size: 14px;
+        color: #999;
+    }
+    
+    /* Smooth transitions for inputs */
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    /* Form Rows - Stack on Mobile */
+    .form-row {
+        display: flex;
+        flex-direction: column !important;
+        gap: 0 !important;
+        width: 100%;
+    }
+
+    .form-row .form-group {
+        width: 100% !important;
+        min-width: 100% !important;
+        margin-bottom: 12px;
+    }
+
+    /* Form Hints */
+    .form-hint {
+        font-size: 0.85rem !important;
+        color: #666;
+        margin-top: 4px;
+        display: block !important;
+        width: 100% !important;
+        clear: both !important;
+    }
+    
+    #quoteModal .form-hint,
+    #invoiceModal .form-hint {
+        font-size: 0.8rem !important;
+        line-height: 1.3 !important;
+        margin-top: 4px !important;
+    }
+    
+    #quoteModal small,
+    #invoiceModal small {
+        font-size: 0.8rem !important;
+        display: block !important;
+        margin-top: 4px !important;
+        clear: both !important;
+    }
+
+    /* -------- FIELDSET SECTIONS -------- */
+
+    fieldset {
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        padding: 12px !important;
+        margin-bottom: 15px !important;
+        background: #fafafa;
+        transition: all 0.2s ease;
+        contain: layout style;
+        will-change: auto;
+    }
+
+    legend {
+        font-size: 0.95rem !important;
+        font-weight: 700 !important;
+        color: #667eea;
+        padding: 0 8px;
+        margin-left: -8px;
+        word-wrap: break-word;
+        max-width: 100%;
+        line-height: 1.4;
+        will-change: auto;
+    }
+    
+    /* Special handling for Quote Modal fieldsets */
+    #quoteModal fieldset {
+        padding: 12px !important;
+        margin-bottom: 15px !important;
+        transform: translateZ(0);
+        backface-visibility: hidden;
+        border: 2px solid #e0e0e0 !important;
+        background: #fafafa !important;
+        border-radius: 8px !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
+    }
+    
+    #quoteModal legend {
+        font-size: 1rem !important;
+        padding: 5px 10px !important;
+        margin-left: -5px !important;
+        background: #667eea !important;
+        color: white !important;
+        border-radius: 4px !important;
+        width: auto !important;
+        max-width: calc(100% - 20px) !important;
+        margin-bottom: 12px !important;
+        display: inline-block !important;
+    }
+    
+    #quoteModal h3 {
+        font-size: 1rem !important;
+        margin: 15px 0 10px 0 !important;
+        color: #667eea !important;
+        padding: 8px 0 !important;
+        border-bottom: 2px solid #e0e0e0 !important;
+        clear: both !important;
+    }
+    
+    #quoteModal .form-row {
+        display: flex;
+        flex-direction: column !important;
+        gap: 0 !important;
+        width: 100% !important;
+        clear: both !important;
+    }
+    
+    #quoteModal .form-group {
+        width: 100% !important;
+        margin-bottom: 12px !important;
+        box-sizing: border-box !important;
+    }
+    
+    #quoteModal .form-group label {
+        font-size: 0.9rem !important;
+        margin-bottom: 6px !important;
+        display: block !important;
+        color: #333 !important;
+    }
+    
+    #quoteModal .form-group input,
+    #quoteModal .form-group select,
+    #quoteModal .form-group textarea {
+        width: 100% !important;
+        box-sizing: border-box !important;
+        font-size: 16px !important;
+        padding: 10px 12px !important;
+    }
+    
+    /* Hide conditional fields properly */
+    #quoteCUIRow,
+    #quoteCNPRow {
+        width: 100% !important;
+        transition: all 0.3s ease !important;
+    }
+    
+    #quoteCUIRow[style*="display: none"],
+    #quoteCNPRow[style*="display: none"] {
+        display: none !important;
+        height: 0 !important;
+        overflow: hidden !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+    
+    /* Client type conditional fields */
+    .client-type-field {
+        display: block !important;
+        transition: opacity 0.2s ease;
+    }
+    
+    .client-type-field.hidden {
+        display: none !important;
+    }
+
+    /* -------- SECTIONS WITH BACKGROUND -------- */
+
+    .invoice-business-section,
+    .invoice-calculations {
+        background: #f8f9fa !important;
+        padding: 10px !important;
+        border-radius: 6px !important;
+        margin: 12px 0 !important;
+        border-left: 3px solid #667eea;
+    }
+
+    .invoice-business-section h3,
+    .invoice-calculations h3,
+    fieldset legend + div h3 {
+        font-size: 0.95rem !important;
+        margin: 10px 0 8px 0 !important;
+        color: #667eea;
+        font-weight: 700;
+    }
+
+    /* -------- INVOICE TOTALS BREAKDOWN -------- */
+
+    .invoice-total-breakdown {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+        padding: 12px !important;
+        border-radius: 8px !important;
+        margin: 15px 0 !important;
+        color: white;
+    }
+
+    .total-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 8px 0 !important;
+        font-size: 1rem !important;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.2) !important;
+    }
+
+    .total-row:last-child {
+        border-bottom: none !important;
+    }
+
+    .total-final {
+        font-size: 1.3rem !important;
+        font-weight: 700 !important;
+        padding: 10px 0 0 0 !important;
+        margin-top: 8px !important;
+        border-top: 2px solid rgba(255, 255, 255, 0.5) !important;
+        text-align: right;
+    }
+
+    /* -------- INVOICE ITEM ROWS -------- */
+
+    .invoice-item-row {
+        display: flex !important;
+        flex-direction: column !important;
+        grid-template-columns: none !important;
+        gap: 8px !important;
+        padding: 12px !important;
+        background: #f8f9fa !important;
+        border-radius: 8px !important;
+        margin-bottom: 10px !important;
+        border-left: 3px solid #667eea;
+    }
+
+    .invoice-item-row label {
+        font-size: 0.85rem;
+        color: #666;
+        font-weight: 600;
+        margin-bottom: 4px;
+    }
+
+    .invoice-item-row input {
+        font-size: 15px !important;
+        width: 100% !important;
+        padding: 10px !important;
+    }
+
+    .invoice-item-row .btn {
+        width: 100% !important;
+        margin-top: 4px;
+    }
+
+    .invoice-item-row .btn-danger {
+        background: #f44336;
+        font-size: 0.9rem;
+    }
+
+    /* -------- ADD ITEM BUTTON -------- */
+
+    #addInvoiceItem,
+    #addQuoteItem {
+        width: 100% !important;
+        padding: 12px !important;
+        font-size: 1rem !important;
+        margin-bottom: 15px !important;
+        touch-action: manipulation;
+        clear: both !important;
+        display: block !important;
+    }
+    
+    /* Quote items container */
+    #quoteItems,
+    #invoiceItems {
+        width: 100% !important;
+        margin: 15px 0 !important;
+        clear: both !important;
+    }
+    
+    /* Title for items section */
+    #quoteModal h3:has(+ #addQuoteItem),
+    #invoiceModal h3:has(+ #addInvoiceItem) {
+        margin-top: 20px !important;
+    }
+        padding: 12px !important;
+        font-size: 1rem !important;
+        margin-bottom: 15px !important;
+        touch-action: manipulation;
+    }
+
+    /* -------- FORM ACTIONS (Buttons) -------- */
+
+    .form-actions {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 8px !important;
+        margin-top: 20px !important;
+        justify-content: stretch;
+    }
+
+    .form-actions .btn {
+        width: 100% !important;
+        padding: 12px 16px !important;
+        font-size: 1rem !important;
+        min-height: 44px !important;
+        border-radius: 8px !important;
+        touch-action: manipulation;
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    .form-actions .btn:active {
+        transform: scale(0.98);
+    }
+    
+    /* Buttons in forms - ensure they're always visible and clickable */
+    form .btn,
+    .modal .btn {
+        min-height: 44px !important;
+        font-size: 1rem !important;
+        padding: 12px 20px !important;
+        touch-action: manipulation;
+        user-select: none;
+        -webkit-tap-highlight-color: transparent;
+    }
+    
+    /* Specific buttons */
+    #addInvoiceBtn,
+    #addQuoteBtn {
+        width: auto !important;
+        min-width: 150px;
+        padding: 10px 20px !important;
+        font-size: 0.95rem !important;
+        white-space: nowrap;
+    }
+    
+    /* Save buttons in modals */
+    button[type="submit"] {
+        width: 100% !important;
+        margin-top: 10px;
+    }
+    
+    /* -------- INVOICE MODAL SPECIFIC -------- */
+    
+    #invoiceModal .form-row {
+        display: flex;
+        flex-direction: column !important;
+        gap: 0 !important;
+        width: 100% !important;
+    }
+    
+    #invoiceModal .form-group {
+        width: 100% !important;
+        margin-bottom: 12px !important;
+        box-sizing: border-box !important;
+    }
+    
+    #invoiceModal .form-group label {
+        font-size: 0.9rem !important;
+        margin-bottom: 6px !important;
+        display: block !important;
+    }
+    
+    #invoiceModal .form-group input,
+    #invoiceModal .form-group select,
+    #invoiceModal .form-group textarea {
+        width: 100% !important;
+        box-sizing: border-box !important;
+        font-size: 16px !important;
+        padding: 10px 12px !important;
+    }
+    
+    #invoiceModal h3 {
+        font-size: 1rem !important;
+        margin: 15px 0 10px 0 !important;
+        color: #667eea !important;
+        padding: 8px 0 !important;
+        border-bottom: 2px solid #e0e0e0 !important;
+        clear: both !important;
+    }
+    
+    /* Invoice business section on mobile */
+    #invoiceModal .invoice-business-section {
+        padding: 12px !important;
+        margin: 15px 0 !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
+    }
+    
+    /* Invoice calculations section */
+    #invoiceModal .invoice-calculations {
+        padding: 12px !important;
+        margin: 15px 0 !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
+    }
+    
+    /* Hide conditional fields in invoice */
+    #invoiceCUIRow,
+    #invoiceCNPRow {
+        width: 100% !important;
+        transition: all 0.3s ease !important;
+    }
+    
+    #invoiceCUIRow[style*="display: none"],
+    #invoiceCNPRow[style*="display: none"] {
+        display: none !important;
+        height: 0 !important;
+        overflow: hidden !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    /* -------- INVOICE DETAIL MODAL -------- */
+
+    #invoiceDetailModal .modal-content {
+        display: flex !important;
+        flex-direction: column !important;
+        position: relative !important;
+    }
+
+    /* ANAF Sidebar - Mobile */
+    .invoice-anaf-sidebar {
+        width: 100% !important;
+        border-radius: 8px 8px 0 0 !important;
+        border-right: none !important;
+        border-bottom: 3px solid #667eea;
+        padding: 12px !important;
+        margin-bottom: 15px !important;
+        min-height: auto;
+    }
+
+    .invoice-anaf-sidebar div {
+        padding: 0 !important;
+        gap: 8px !important;
+    }
+
+    .invoice-anaf-sidebar h3 {
+        margin: 0 0 10px 0 !important;
+        font-size: 1rem !important;
+    }
+
+    #submitInvoiceToANAFBtn {
+        width: 100% !important;
+        padding: 12px 16px !important;
+        font-size: 0.95rem !important;
+        height: auto !important;
+        min-height: 44px !important;
+    }
+
+    #invoiceANAFStatus {
+        padding: 10px !important;
+        min-height: 44px !important;
+        font-size: 0.9rem !important;
+    }
+
+    #invoiceANAFInfo {
+        font-size: 0.8rem !important;
+        padding: 10px !important;
+        margin-top: 8px !important;
+    }
+
+    /* -------- INVOICE DETAIL CONTENT -------- */
+
+    .invoice-detail-content {
+        flex: 1;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        padding: 10px 0;
+    }
+
+    .invoice-professional-display {
+        font-size: 0.95rem;
+    }
+
+    .invoice-header-section {
+        flex-direction: column !important;
+        gap: 15px !important;
+        margin-bottom: 15px !important;
+        padding-bottom: 12px !important;
+        border-bottom: 2px solid #667eea !important;
+    }
+
+    .invoice-company-info h2 {
+        font-size: 1.2rem !important;
+        margin-bottom: 8px !important;
+    }
+
+    .invoice-company-info p {
+        font-size: 0.85rem;
+        line-height: 1.4;
+    }
+
+    .invoice-details-table {
+        font-size: 0.85rem !important;
+        margin: 12px 0 !important;
+        width: 100%;
+    }
+
+    .invoice-details-table th {
+        padding: 8px 6px !important;
+        font-size: 0.8rem;
+    }
+
+    .invoice-details-table td {
+        padding: 6px 4px !important;
+        font-size: 0.8rem;
+    }
+
+    .invoice-summary-section {
+        justify-content: center !important;
+        margin-top: 15px !important;
+    }
+
+    .invoice-summary-box {
+        min-width: 100% !important;
+        width: 100%;
+        padding: 12px !important;
+    }
+
+    .invoice-footer {
+        font-size: 0.85rem;
+        padding-top: 12px !important;
+        margin-top: 15px !important;
+    }
+
+    /* -------- DETAIL ROWS -------- */
+
+    .detail-row {
+        display: flex !important;
+        flex-direction: column !important;
+        padding: 10px 0 !important;
+        border-bottom: 1px solid #e0e0e0;
+    }
+
+    .detail-row:last-child {
+        border-bottom: none;
+    }
+
+    .detail-row strong {
+        color: #667eea;
+        margin-bottom: 4px;
+        font-size: 0.9rem;
+    }
+
+    .detail-row span {
+        color: #333;
+        font-size: 0.95rem;
+    }
+
+    /* -------- SECTION HEADERS -------- */
+
+    .form-section,
+    .invoice-section {
+        margin-bottom: 15px !important;
+        padding-bottom: 12px !important;
+    }
+
+    .form-section-title,
+    .invoice-section-title {
+        font-size: 1rem !important;
+        margin-bottom: 10px !important;
+        color: #667eea;
+        font-weight: 600;
+    }
+
+    /* -------- DOWNLOAD/PRINT/EDIT BUTTONS -------- */
+
+    #downloadInvoicePdfBtn,
+    #printInvoiceBtn,
+    #editInvoiceBtn,
+    #markAsPaidBtn,
+    #closeInvoiceDetailBtn {
+        width: 100% !important;
+        padding: 12px 16px !important;
+        font-size: 1rem !important;
+        min-height: 44px !important;
+    }
+
+    /* -------- CHECKBOX & RADIO INPUTS -------- */
+
+    input[type="checkbox"],
+    input[type="radio"] {
+        width: 20px !important;
+        height: 20px !important;
+        cursor: pointer;
+        margin-right: 8px;
+    }
+
+    /* -------- TEXTAREA OPTIMIZATION -------- */
+
+    textarea {
+        min-height: 80px !important;
+        resize: vertical;
+        -webkit-appearance: none;
+        appearance: none;
+    }
+
+    /* -------- QUOTE MODAL SPECIFIC -------- */
+
+    #quoteModal .modal-content,
+    #invoiceModal .modal-content {
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+
+    .quote-item-row {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 8px !important;
+        padding: 12px !important;
+        background: #f8f9fa !important;
+        border-radius: 8px !important;
+        margin-bottom: 10px !important;
+        border-left: 3px solid #667eea;
+    }
+
+    .quote-item-row label {
+        font-size: 0.85rem;
+        color: #666;
+        font-weight: 600;
+        margin-bottom: 4px;
+    }
+
+    .quote-item-row input {
+        font-size: 15px !important;
+        width: 100% !important;
+        padding: 10px !important;
+    }
+
+    /* -------- SCROLLING OPTIMIZATION -------- */
+
+    /* Enable momentum scrolling on iOS */
+    .modal-content,
+    .invoice-detail-content {
+        -webkit-overflow-scrolling: touch;
+        scroll-behavior: smooth;
+    }
+
+    /* -------- TAP TARGETS -------- */
+
+    /* Minimum 44x44px tap target */
+    .btn,
+    input[type="button"],
+    input[type="submit"],
+    button {
+        min-width: 44px;
+        min-height: 44px;
+    }
+
+    /* -------- SPACING OPTIMIZATION -------- */
+
+    /* More generous spacing for mobile */
+    .form-group {
+        margin-bottom: 16px;
+    }
+
+    .form-actions {
+        margin-top: 25px;
+    }
+
+    /* -------- ACCESSIBILITY -------- */
+
+    /* Better focus states for touch */
+    input:focus,
+    select:focus,
+    textarea:focus,
+    button:focus {
+        outline: 2px solid #667eea;
+        outline-offset: 2px;
+    }
+
+    /* -------- MODAL BACKDROP SWIPE-DOWN TO CLOSE -------- */
+
+    .modal.show {
+        animation: fadeIn 0.3s ease-out;
+    }
+
+    /* Disable horizontal scroll */
+    body.modal-open {
+        overflow: hidden;
+    }
+
+    /* -------- LANDSCAPE MODE OPTIMIZATION -------- */
+
+    @media (max-height: 600px) and (orientation: landscape) {
+        .modal-content {
+            max-height: 98vh !important;
+            padding: 10px !important;
+        }
+
+        .modal-content h2 {
+            font-size: 1.1rem !important;
+            margin-bottom: 8px !important;
+        }
+
+        .form-group {
+            margin-bottom: 8px;
+        }
+
+        .form-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+
+        .invoice-item-row {
+            display: grid !important;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px !important;
+        }
+    }
+
+    /* -------- VERY SMALL PHONES (320px - 375px) -------- */
+
+    @media (max-width: 375px) {
+        .modal-content {
+            padding: 12px !important;
+        }
+
+        .modal-content h2 {
+            font-size: 1.1rem !important;
+        }
+
+        .form-group label {
+            font-size: 0.9rem;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            font-size: 15px !important;
+            padding: 10px !important;
+        }
+
+        .btn {
+            font-size: 0.9rem !important;
+            padding: 10px 12px !important;
+        }
+
+        .close {
+            font-size: 28px;
+            width: 40px;
+            height: 40px;
+        }
+
+        .total-row {
+            font-size: 0.9rem !important;
+        }
+
+        .total-final {
+            font-size: 1.1rem !important;
+        }
+
+        .invoice-item-row {
+            padding: 10px !important;
+        }
+
+        /* Stack buttons for very small screens */
+        .form-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+    }
+}
+
+/* ==========================================
+   IPHONE SPECIFIC FIXES
+   ========================================== */
+
+@supports (-webkit-touch-callout: none) {
+    /* iOS-specific optimizations */
+    
+    .modal-content {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        border-radius: 20px 20px 0 0;
+        max-height: 95vh;
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+        font-size: 16px !important; /* Prevents zoom */
+        border-radius: 8px;
+    }
+
+    input[type="date"],
+    input[type="time"],
+    input[type="email"],
+    input[type="tel"],
+    input[type="number"] {
+        font-size: 16px !important;
+    }
+
+    /* Prevent zoom on input focus */
+    input,
+    select,
+    textarea,
+    button {
+        font-size: 16px !important;
+    }
+
+    /* iOS keyboard safe area */
+    .modal-content {
+        padding-bottom: max(15px, env(safe-area-inset-bottom)) !important;
+    }
+
+    /* Smooth scrolling */
+    .modal-content,
+    .invoice-detail-content {
+        -webkit-overflow-scrolling: touch;
+    }
+}
+
+/* ==========================================
+   ANDROID SPECIFIC FIXES
+   ========================================== */
+
+@media (any-pointer: coarse) {
+    /* Touch devices */
+    
+    .btn,
+    button,
+    input[type="button"],
+    input[type="submit"] {
+        min-height: 48px;
+        min-width: 48px;
+        padding: 14px 18px;
+    }
+
+    .close {
+        min-height: 48px;
+        min-width: 48px;
+    }
+
+    input,
+    select,
+    textarea {
+        min-height: 44px;
+        padding: 12px;
+    }
+
+    /* Larger touch targets */
+    .form-group {
+        margin-bottom: 18px;
+    }
+}
+
+/* ==========================================
+   SECTION HEADER BUTTONS (Invoice/Quote)
+   ========================================== */
+@media (max-width: 768px) {
+    .section-header {
+        display: flex !important;
+        flex-wrap: wrap !important;
+        gap: 10px !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+    }
+    
+    .section-header h2 {
+        flex: 1 1 100% !important;
+        margin-bottom: 10px !important;
+    }
+    
+    .section-header select {
+        flex: 1 1 auto !important;
+        min-width: 150px !important;
+    }
+    
+    .section-header .btn {
+        flex: 0 0 auto !important;
+        white-space: nowrap !important;
+    }
+    
+    #addInvoiceBtn,
+    #addQuoteBtn {
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        gap: 6px !important;
+        padding: 10px 16px !important;
+        font-size: 0.95rem !important;
+        min-height: 44px !important;
+        border-radius: 8px !important;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+        color: white !important;
+        border: none !important;
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3) !important;
+        cursor: pointer !important;
+        touch-action: manipulation !important;
+        user-select: none !important;
+        -webkit-tap-highlight-color: transparent !important;
+    }
+    
+    #addInvoiceBtn:active,
+    #addQuoteBtn:active {
+        transform: scale(0.98) !important;
+        box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3) !important;
+    }
+}
+
+/* ==========================================
+   DARK MODE SUPPORT FOR MOBILE
+   ========================================== */
+@media (max-width: 768px) {
+    /* Dark Mode - Modal Backgrounds */
+    body.dark-mode .modal-content {
+        background: #1a202c !important;
+        color: #e5e7eb !important;
+        border-top: 3px solid #667eea;
+    }
+    
+    body.dark-mode .modal-content h2 {
+        color: #f3f4f6 !important;
+    }
+    
+    /* Dark Mode - Form Elements */
+    body.dark-mode .form-group label {
+        color: #f3f4f6 !important;
+    }
+    
+    body.dark-mode .form-group input,
+    body.dark-mode .form-group select,
+    body.dark-mode .form-group textarea {
+        background: #2d3748 !important;
+        color: #e5e7eb !important;
+        border-color: #4a5568 !important;
+    }
+    
+    body.dark-mode .form-group input::placeholder,
+    body.dark-mode .form-group textarea::placeholder {
+        color: #9ca3af !important;
+    }
+    
+    body.dark-mode .form-group input:focus,
+    body.dark-mode .form-group select:focus,
+    body.dark-mode .form-group textarea:focus {
+        background: #374151 !important;
+        border-color: #667eea !important;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2) !important;
+    }
+    
+    /* Dark Mode - Fieldsets */
+    body.dark-mode fieldset {
+        background: #1f2937 !important;
+        border-color: #4a5568 !important;
+    }
+    
+    body.dark-mode legend {
+        color: #93c5fd !important;
+    }
+    
+    /* Dark Mode - Business Sections */
+    body.dark-mode .invoice-business-section,
+    body.dark-mode .invoice-calculations {
+        background: #1f2937 !important;
+        border-left-color: #60a5fa !important;
+    }
+    
+    body.dark-mode .invoice-business-section h3,
+    body.dark-mode .invoice-calculations h3 {
+        color: #93c5fd !important;
+    }
+    
+    /* Dark Mode - Form Hints */
+    body.dark-mode .form-hint {
+        color: #9ca3af !important;
+    }
+    
+    /* Dark Mode - Close Button */
+    body.dark-mode .close {
+        background: rgba(45, 55, 72, 0.95) !important;
+        color: #e5e7eb !important;
+    }
+    
+    body.dark-mode .close:hover {
+        background: #2d3748 !important;
+    }
+    
+    /* Dark Mode - Invoice Item Rows */
+    body.dark-mode .invoice-item-row {
+        background: #1f2937 !important;
+        border-left-color: #60a5fa !important;
+    }
+    
+    /* Dark Mode - Buttons */
+    body.dark-mode .btn-remove {
+        background: #dc2626 !important;
+        color: white !important;
+    }
+    
+    body.dark-mode .btn-secondary {
+        background: #374151 !important;
+        color: #e5e7eb !important;
+        border-color: #4a5568 !important;
+    }
+}
+
